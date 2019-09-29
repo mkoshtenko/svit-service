@@ -1,5 +1,5 @@
 import Fluent
-import FluentSQLiteDriver
+import FluentPostgresDriver
 import Vapor
 
 /// Called before your application initializes.
@@ -27,20 +27,25 @@ func configure(_ s: inout Services) throws {
     }
     
     s.extend(Databases.self) { dbs, c in
-        try dbs.sqlite(configuration: c.make(), threadPool: c.make())
+        try dbs.postgres(config: c.make())
     }
 
-    s.register(SQLiteConfiguration.self) { c in
-        return .init(storage: .connection(.file(path: "db.sqlite")))
+    s.register(PostgresConfiguration.self) { c in
+        return .init(hostname: "127.0.0.1",
+                     port: 54320,
+                     username: "svit_db_user",
+                     password: "password",
+                     database: "svit_db")
     }
 
     s.register(Database.self) { c in
-        return try c.make(Databases.self).database(.sqlite)!
+        return try c.make(Databases.self).database(.psql)!
     }
     
     s.register(Migrations.self) { c in
         var migrations = Migrations()
-        migrations.add(CreateTodo(), to: .sqlite)
+        migrations.add(CreateVertex(), to: .psql)
+        migrations.add(CreateRelation(), to: .psql)
         return migrations
     }
 }

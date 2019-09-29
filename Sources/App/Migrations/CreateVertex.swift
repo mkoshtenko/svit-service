@@ -1,14 +1,15 @@
 import Fluent
 
-struct CreateTodo: Migration {
+struct CreateVertex: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema("todos")
+        return database.schema(Vertex.schema)
             .field("id", .int, .identifier(auto: true))
-            .field("title", .string, .required)
+            .field("type", .string, .required)
+            .field("data", .string, .required)
             .create()
     }
 
     func revert(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema("todos").delete()
+        return database.schema(Vertex.schema).delete()
     }
 }

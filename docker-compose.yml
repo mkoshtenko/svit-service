@@ -1,11 +1,35 @@
-version: '2'
+version: '3.1'
 
 services:
-  db:
-    image: postgres:11
+  svit_db:
+    image: postgres:12-alpine
+    restart: always
     environment:
-      POSTGRES_USER: vapor_username
-      POSTGRES_DB: vapor_database
-      POSTGRES_PASSWORD: vapor_password
+      POSTGRES_USER: ${SVIT_DB_USER}
+      POSTGRES_DB: ${SVIT_DB_NAME}
+      POSTGRES_PASSWORD: ${SVIT_DB_PASSWORD}
     ports:
-      - 5432:5432
+      - ${SVIT_DB_PORT}:5432
+    networks:
+      - app-network
+
+  svit_app:
+    build:
+      context: .
+      dockerfile: web.Dockerfile
+    image: svit
+    container_name: svit
+    restart: unless-stopped
+    environment:
+      SVIT_DB_USER: ${SVIT_DB_USER}
+      SVIT_DB_NAME: ${SVIT_DB_NAME}
+      SVIT_DB_PASSWORD: ${SVIT_DB_PASSWORD}
+      SVIT_DB_PORT: ${SVIT_DB_PORT}
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+      
+networks:
+  app-network:
+    driver: bridge
