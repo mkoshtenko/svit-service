@@ -33,6 +33,7 @@ docker-compose up -d
 Using docker-compose ps, check the status of your services:
 ```
 docker-compose ps
+docker-compose stop
 ```
 
 ## How to run a debug build
@@ -63,13 +64,13 @@ docker exec -it svit_db_postgres bash
 docker exec -it svit_db_postgres psql -d svit_db -U svit_db_user
 ```
 
-### 3. Migrations
+### 2. Migrations
 In vapor 4 db migration do not run automatically, to do so you have to execute:
 `swift run Run migrate`
 
 it takes configurations and migrations from `configure.swift` and will try to execute them. 
 
-### 2. Launch  From the XCode
+### 3. Launch  From the XCode
 1. Choose `Run` target against the Mac machine
 2. Hit `CMD+R`
 
@@ -79,7 +80,7 @@ it takes configurations and migrations from `configure.swift` and will try to ex
 `curl http://localhost:8080/vertices`   // will be removed.
 
 - create:
-`curl -H "Content-Type: application/json" -d '{"data":"{\"a\":1,\"b\":[]}"}' -X POST http://localhost:8080/vertices`
+`curl -H "Content-Type: application/json" -d '{"type":"test", "data":"{\"a\":1,\"b\":[]}"}' -X POST http://localhost:8080/vertices`
 
 - delete:
 `curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/vertices/3`

@@ -8,8 +8,8 @@ services:
       POSTGRES_USER: ${SVIT_DB_USER}
       POSTGRES_DB: ${SVIT_DB_NAME}
       POSTGRES_PASSWORD: ${SVIT_DB_PASSWORD}
-    ports:
-      - ${SVIT_DB_PORT}:5432
+    expose:
+      - ${SVIT_DB_PORT}
     networks:
       - app-network
 
@@ -17,16 +17,21 @@ services:
     build:
       context: .
       dockerfile: web.Dockerfile
+      args:
+        env: "dev"
     image: svit
     container_name: svit
+    depends_on:
+      - svit_db
     restart: unless-stopped
     environment:
       SVIT_DB_USER: ${SVIT_DB_USER}
       SVIT_DB_NAME: ${SVIT_DB_NAME}
       SVIT_DB_PASSWORD: ${SVIT_DB_PASSWORD}
       SVIT_DB_PORT: ${SVIT_DB_PORT}
+      SVIT_DB_HOST: "svit_db"
     ports:
-      - "80:80"
+      - "8080:80"
     networks:
       - app-network
       
