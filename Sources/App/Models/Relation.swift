@@ -29,3 +29,14 @@ final class Relation: Model, Content {
         self.data = data
     }
 }
+
+extension Relation: Equatable {
+    static func == (lhs: Relation, rhs: Relation) -> Bool {
+        guard lhs !== rhs else { return true }
+        return lhs.id == rhs.id
+            && lhs.type == rhs.type
+            && lhs.from == rhs.from
+            && lhs.to == rhs.to
+            && lhs.data == rhs.data
+    }
+}

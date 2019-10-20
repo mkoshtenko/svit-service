@@ -1,63 +1,94 @@
 import XCTest
-import Vapor
-import Fluent
 
 @testable import App
 
-final class VertexTests: XCTestCase {
-    func testVertexList() throws {
-//        let app = Application(environment: .testing) { s in
-//            try configure(&s)
-//            s.provider(FluentProvider())
-//            s.extend(Routes.self) { r, c in
-//                try routes(r, c)
-//            }
-//        }
-//        try app.boot()
-//        
-//
-//        
-//      // 1
-//      let expectedName = "Alice"
-//      let expectedUsername = "alice"
-//
-//      // 2
-//      var config = Config.default()
-//      var services = Services.default()
-//      var env = Environment.testing
-//      try App.configure(&config, &env, &services)
-//      let app = try Application(config: config, environment: env, services: services)
-//      try App.boot(app)
-//
-//      // 3
-//      let conn = try app.newConnection(to: .psql).wait()
-//
-//      // 4
-//      let user = User(name: expectedName, username: expectedUsername)
-//      let savedUser = try user.save(on: conn).wait()
-//      _ = try User(name: "Luke", username: "lukes").save(on: conn).wait()
-//
-//      // 5
-//      let responder = try app.make(Responder.self)
-//
-//      // 6
-//      let request = HTTPRequest(method: .GET, url: URL(string: "/api/users")!)
-//      let wrappedRequest = Request(http: request, using: app)
-//
-//      // 7
-//      let response = try responder.respond(to: wrappedRequest).wait()
-//
-//      // 8
-//      let data = response.http.body.data
-//      let users = try JSONDecoder().decode([User].self, from: data!)
-//
-//      // 9
-//      XCTAssertEqual(users.count, 2)
-//      XCTAssertEqual(users[0].name, expectedName)
-//      XCTAssertEqual(users[0].username, expectedUsername)
-//      XCTAssertEqual(users[0].id, savedUser.id)
-//
-//      // 10
-//      conn.close()
+
+final class VertexTests: XCTVaporTestCase {
+    func testAddAndDeleteVertex() throws {
+        let vertex1 = Vertex(id: 1, type: "type1", data: "")
+        let vertex2 = Vertex(id: 2, type: "type2", data: "")
+
+        try app.testable().start(method: .inMemory)
+            // Verify the are no vertices
+            .test(.GET, "/vertices") { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqual(res.body.string, "[]")
+        }
+            // Create first vertex
+            .test(.POST, "/vertices", json: vertex1) { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqualJSON(res.body.string, vertex1)
+        }
+            // Verify first vertex exists
+            .test(.GET, "/vertices/\(vertex1.id!)") { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqualJSON(res.body.string, vertex1)
+        }
+            // Create second vertex
+            .test(.POST, "/vertices", json: vertex2) { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqualJSON(res.body.string, vertex2)
+        }
+            // Verify second vertex exists
+            .test(.GET, "/vertices/\(vertex2.id!)") { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqualJSON(res.body.string, vertex2)
+        }
+            // Get list
+            .test(.GET, "/vertices") { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqualJSON(res.body.string, [vertex1, vertex2])
+        }
+            // Delete second vertex
+            .test(.DELETE, "/vertices/\(vertex2.id!)") { res in
+                XCTAssertEqual(res.status, .ok)
+        }
+            // Verify second vertex does not exists
+            .test(.GET, "/vertices/\(vertex2.id!)") { res in
+                XCTAssertEqual(res.status, .notFound)
+        }
+            // Delete first vertex
+            .test(.DELETE, "/vertices/\(vertex1.id!)") { res in
+                XCTAssertEqual(res.status, .ok)
+        }
+            // Verify first vertex does not exists
+            .test(.GET, "/vertices/\(vertex1.id!)") { res in
+                XCTAssertEqual(res.status, .notFound)
+        }
+            // Check the list is empty
+            .test(.GET, "/vertices") { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqual(res.body.string, "[]")
+        }
+    }
+
+    func testVertexUpdate() throws {
+        let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
+        let vertex = Vertex(id: 1, type: "type", data: "")
+        try app.testable().start(method: .inMemory)
+            // Create a vertex
+            .test(.POST, "/vertices", json: vertex) { res in
+                XCTAssertEqual(res.status, .ok)
+                XCTAssertEqualJSON(res.body.string, vertex)
+        }
+            // Update data
+            .test(.PATCH, "/vertices/\(vertex.id!)", json: ["data": json, "type": "new"]) { res in
+                XCTAssertEqual(res.status, .ok)
+                let decoded = res.vertex
+                XCTAssertNotNil(decoded)
+                XCTAssertEqual(decoded?.type, vertex.type, "Value shoud be equal to original")
+                XCTAssertEqual(decoded?.data, json, "Data field should be replaced with the new one")
+        }
+            // Update without data failed
+            .test(.PATCH, "/vertices/\(vertex.id!)", json: ["a": "b"]) { res in
+                XCTAssertEqual(res.status, .badRequest)
+        }
+    }
+}
+
+private extension XCTHTTPResponse {
+    var vertex: Vertex? {
+        guard let data = body.data else { return nil }
+        return try? JSONDecoder().decode(Vertex.self, from: data)
     }
 }

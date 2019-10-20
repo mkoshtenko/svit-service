@@ -1,3 +1,7 @@
 import App
+import Vapor
 
-try app(.detect()).run()
+try app(context: Context(environment: try Environment.detect(),
+                         databaseFactory: PSQLFactory()))
+    .run()
+

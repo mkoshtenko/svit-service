@@ -21,3 +21,10 @@ final class Vertex: Model, Content {
         self.data = data
     }
 }
+
+extension Vertex: Equatable {
+    static func == (lhs: Vertex, rhs: Vertex) -> Bool {
+        guard lhs !== rhs else { return true }
+        return lhs.id == rhs.id && lhs.type == rhs.type && lhs.data == rhs.data
+    }
+}

@@ -20,7 +20,12 @@ final class RelationController {
 
     func create(req: Request) throws -> EventLoopFuture<Relation> {
         let relation = try req.content.decode(Relation.self)
-        return relation.save(on: db).map { relation }
+        return Vertex.find(relation.from, on: db)
+            .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.from) not found"))
+            .flatMap { _ in Vertex.find(relation.to, on: self.db) }
+            .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.to) not found"))
+            .flatMap { _ in relation.save(on: self.db) }
+            .map { relation }
     }
 
     func get(req: Request) throws -> EventLoopFuture<Relation> {
