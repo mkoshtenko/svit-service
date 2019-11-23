@@ -1,6 +1,21 @@
 ## Overview
 Storage for simple vertices inside table 
 
+## Run tests
+Update Vapor Toolbox
+`brew upgrade vapor`
+
+Updates dependencies
+`vapor update`
+
+If you are experiencing problems with Swift Package Manager, sometimes cleaning can help.
+`vapor clean`
+
+Open Xcode
+`vapor xcode -y`
+
+To run unit tests, select `Run` scheme and hit `Command+U`.
+
 ## How to build and run
 ### Docker
 Before start you can remove all cached data:
@@ -71,7 +86,7 @@ In vapor 4 db migration do not run automatically, to do so you have to execute:
 it takes configurations and migrations from `configure.swift` and will try to execute them. 
 
 ### 3. Launch  From the XCode
-1. Choose `Run` target against the Mac machine
+1. Choose `Run` scheme against the Mac machine
 2. Hit `CMD+R`
 
 ## API usage examples
