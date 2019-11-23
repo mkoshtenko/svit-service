@@ -87,7 +87,8 @@ public final class XCTApplication {
             return self
         }
 
-        func prepareDatabase(_ block: (Database) throws -> Void) throws -> XCTApplicationTester {
+        @discardableResult
+        func manageDatabase(_ block: (Database) throws -> Void) throws -> XCTApplicationTester {
             let database: Database = try container.make()
             try block(database)
             return self
@@ -139,7 +140,8 @@ public final class XCTApplication {
             return self
         }
 
-        func prepareDatabase(_ block: (Database) throws -> Void) throws -> XCTApplicationTester {
+        @discardableResult
+        func manageDatabase(_ block: (Database) throws -> Void) throws -> XCTApplicationTester {
             let database: Database = try container.make()
             try block(database)
             return self
@@ -165,7 +167,8 @@ public protocol XCTApplicationTester {
 
     func shutdown()
 
-    func prepareDatabase(_ block: (Database) throws -> Void) throws -> XCTApplicationTester
+    @discardableResult
+    func manageDatabase(_ block: (Database) throws -> Void) throws -> XCTApplicationTester
 }
 
 extension XCTApplicationTester {

@@ -84,6 +84,33 @@ final class VertexTests: XCTVaporTestCase {
                 XCTAssertEqual(res.status, .badRequest)
         }
     }
+
+    func testDeleteVertexWithRelationTo() throws {
+        let vertexToId = 2
+        try app.testable().start(method: .inMemory)
+            .manageDatabase() { db in
+                try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+                try Vertex(id: vertexToId, type: "t", data: "").save(on: db).wait()
+                try Relation(id: 1, type: "t", from: 1, to: vertexToId, data: "").save(on: db).wait()
+        }
+            // Delete 'to' vertex
+            .test(.DELETE, "/vertices/\(vertexToId)") { res in
+                XCTAssertEqual(res.status, .ok)
+        }
+            // Verify 'to' vertex does not exist
+            .test(.GET, "/vertices/\(vertexToId)") { res in
+                XCTAssertEqual(res.status, .notFound)
+        }
+            // Verify 'from' vertex exists
+            .test(.GET, "/vertices/\(1)") { res in
+                XCTAssertEqual(res.status, .ok)
+        }
+            // Verify relation was deleted
+            .manageDatabase() { db in
+                XCTAssertEqual(try Vertex.query(on: db).all().wait().count, 1)
+                XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
+        }
+    }
 }
 
 private extension XCTHTTPResponse {

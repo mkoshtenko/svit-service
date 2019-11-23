@@ -31,10 +31,25 @@ final class VertexController {
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let vertexId: Int? = req.parameters.get(Path.vertexId)
+        // TODO: Refactor delete. Preferrably the should be single transaction.
         return Vertex.find(vertexId, on: db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { $0.delete(on: self.db) }
-            .transform(to: .ok)
+            .flatMap { vertex in
+                vertex.delete(on: self.db).map { vertex }
+
+        }
+        .flatMap { vertex in
+            Relation.query(on: self.db)
+                .filter(\.$to == vertex.id!)
+                .all()
+                .map {
+                    $0.map {
+                        $0.delete(on: self.db)
+                    }
+            }
+
+        }
+        .transform(to: .ok)
     }
 
     func update(req: Request) throws -> EventLoopFuture<Vertex> {
