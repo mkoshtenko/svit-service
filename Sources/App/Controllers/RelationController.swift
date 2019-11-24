@@ -7,39 +7,33 @@ final class RelationController {
         static let relationId = "relation_id"
     }
 
-    let db: Database
-
-    init(db: Database) {
-        self.db = db
-    }
-
     // TODO: remove list method
     func list(req: Request) throws -> EventLoopFuture<[Relation]> {
-        return Relation.query(on: db).all()
+        return Relation.query(on: req.db).all()
     }
 
     func create(req: Request) throws -> EventLoopFuture<Relation> {
         let relation = try req.content.decode(Relation.self)
-        return Vertex.find(relation.from, on: db)
+        return Vertex.find(relation.from, on: req.db)
             .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.from) not found"))
-            .flatMap { _ in Vertex.find(relation.to, on: self.db) }
+            .flatMap { _ in Vertex.find(relation.to, on: req.db) }
             .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.to) not found"))
-            .flatMap { _ in relation.save(on: self.db) }
+            .flatMap { _ in relation.save(on: req.db) }
             .map { relation }
     }
 
     func get(req: Request) throws -> EventLoopFuture<Relation> {
         let relationId: Int? = req.parameters.get(Path.relationId)
-        return Relation.find(relationId, on: db)
+        return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let relationId: Int? = req.parameters.get(Path.relationId)
-        return Relation.find(relationId, on: db)
+        return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { $0.delete(on: self.db) }
-            .transform(to: .ok)
+            .flatMap { $0.delete(on: req.db) }
+            .map { .ok }
     }
 
     func update(req: Request) throws -> EventLoopFuture<Relation> {
@@ -48,12 +42,11 @@ final class RelationController {
         }
 
         let relationId: Int? = req.parameters.get(Path.relationId)
-        return Relation.find(relationId, on: db)
+        return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in
                 relation.data = data
-                return relation.update(on: self.db).map { relation }
+                return relation.update(on: req.db).map { relation }
         }
     }
-
 }

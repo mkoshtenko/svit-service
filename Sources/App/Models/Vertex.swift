@@ -1,5 +1,5 @@
-import Vapor
 import Fluent
+import Vapor
 
 final class Vertex: Model, Content {
     static let schema = "vertices"

@@ -8,7 +8,7 @@ final class VertexTests: XCTVaporTestCase {
         let vertex1 = Vertex(id: 1, type: "type1", data: "")
         let vertex2 = Vertex(id: 2, type: "type2", data: "")
 
-        try app.testable().start(method: .inMemory)
+        try app.testable()
             // Verify the are no vertices
             .test(.GET, "/vertices") { res in
                 XCTAssertEqual(res.status, .ok)
@@ -65,7 +65,7 @@ final class VertexTests: XCTVaporTestCase {
     func testVertexUpdate() throws {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
         let vertex = Vertex(id: 1, type: "type", data: "")
-        try app.testable().start(method: .inMemory)
+        try app.testable()
             // Create a vertex
             .test(.POST, "/vertices", json: vertex) { res in
                 XCTAssertEqual(res.status, .ok)
@@ -79,7 +79,7 @@ final class VertexTests: XCTVaporTestCase {
                 XCTAssertEqual(decoded?.type, vertex.type, "Value shoud be equal to original")
                 XCTAssertEqual(decoded?.data, json, "Data field should be replaced with the new one")
         }
-            // Update without data failed
+            // Failed update without data
             .test(.PATCH, "/vertices/\(vertex.id!)", json: ["a": "b"]) { res in
                 XCTAssertEqual(res.status, .badRequest)
         }
@@ -87,8 +87,12 @@ final class VertexTests: XCTVaporTestCase {
 
     func testDeleteVertexWithRelationTo() throws {
         let vertexToId = 2
-        try app.testable().start(method: .inMemory)
-            .manageDatabase() { db in
+
+        try app.testable()
+            .prepare {
+                XCTAssertEqual(try Vertex.query(on: db).all().wait().count, 0)
+                XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
+
                 try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
                 try Vertex(id: vertexToId, type: "t", data: "").save(on: db).wait()
                 try Relation(id: 1, type: "t", from: 1, to: vertexToId, data: "").save(on: db).wait()
@@ -104,9 +108,7 @@ final class VertexTests: XCTVaporTestCase {
             // Verify 'from' vertex exists
             .test(.GET, "/vertices/\(1)") { res in
                 XCTAssertEqual(res.status, .ok)
-        }
-            // Verify relation was deleted
-            .manageDatabase() { db in
+                // Verify relation was deleted
                 XCTAssertEqual(try Vertex.query(on: db).all().wait().count, 1)
                 XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
         }

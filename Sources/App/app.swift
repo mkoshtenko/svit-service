@@ -1,9 +1,13 @@
 import Vapor
 
 public func app(context: Context) throws -> Application {
-    let app = Application(environment: context.environment) { s in
-        configure(services: &s, context: context)
+    var environment = context.environment
+    if environment != .testing {
+        try LoggingSystem.bootstrap(from: &environment)
     }
-    try boot(app)
+
+    let app = Application(environment: environment)
+    try configure(app: app, context: context)
+
     return app
 }

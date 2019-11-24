@@ -1,34 +1,21 @@
 import Fluent
 import Vapor
 
-/// Called before your application initializes.
-func configure(services s: inout Services, context: Context) {
-    /// Register providers first
-    s.provider(FluentProvider())
+func configure(app: Application, context: Context) throws {
+    // Register providers first
+    app.provider(FluentProvider())
 
-    /// Register routes
-    s.extend(Routes.self) { r, c in
-        try routes(r, c)
+    // Register middleware
+    app.register(extension: MiddlewareConfiguration.self) { middlewares, app in
+        middlewares.use(app.make(ErrorMiddleware.self))
     }
 
-    /// Register middleware
-    s.register(MiddlewareConfiguration.self) { c in
-        // Create _empty_ middleware config
-        var middlewares = MiddlewareConfiguration()
-        
-        // Serves files from `Public/` directory
-        /// middlewares.use(FileMiddleware.self)
-        
-        // Catches errors and converts to HTTP response
-        try middlewares.use(c.make(ErrorMiddleware.self))
-        
-        return middlewares
-    }
+    app.registerDatabase(context.databaseFactory)
 
-    s.registerDatabase(context.databaseFactory)
-
-    s.registerMigrations(context.databaseFactory) {
+    app.registerMigrations(context.databaseFactory) {
         return [CreateVertex(),
                 CreateRelation()]
     }
+
+    try routes(app)
 }

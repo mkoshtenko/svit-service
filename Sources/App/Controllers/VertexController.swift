@@ -7,44 +7,40 @@ final class VertexController {
         static let vertexId = "vertex_id"
     }
 
-    let db: Database
-
-    init(db: Database) {
-        self.db = db
-    }
+    init() {}
 
     // TODO: remove list method
     func list(req: Request) throws -> EventLoopFuture<[Vertex]> {
-        return Vertex.query(on: db).all()
+        return Vertex.query(on: req.db).all()
     }
 
     func create(req: Request) throws -> EventLoopFuture<Vertex> {
         let vertex = try req.content.decode(Vertex.self)
-        return vertex.save(on: db).map { vertex }
+        return vertex.save(on: req.db).map { vertex }
     }
 
     func get(req: Request) throws -> EventLoopFuture<Vertex> {
         let vertexId: Int? = req.parameters.get(Path.vertexId)
-        return Vertex.find(vertexId, on: db)
+        return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let vertexId: Int? = req.parameters.get(Path.vertexId)
         // TODO: Refactor delete. Preferrably the should be single transaction.
-        return Vertex.find(vertexId, on: db)
+        return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { vertex in
-                vertex.delete(on: self.db).map { vertex }
+                vertex.delete(on: req.db).map { vertex }
 
         }
         .flatMap { vertex in
-            Relation.query(on: self.db)
+            Relation.query(on: req.db)
                 .filter(\.$to == vertex.id!)
                 .all()
                 .map {
                     $0.map {
-                        $0.delete(on: self.db)
+                        $0.delete(on: req.db)
                     }
             }
 
@@ -58,11 +54,11 @@ final class VertexController {
         }
 
         let vertexId: Int? = req.parameters.get(Path.vertexId)
-        return Vertex.find(vertexId, on: db)
+        return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { vertex in
                 vertex.data = data
-                return vertex.update(on: self.db).map { vertex }
+                return vertex.update(on: req.db).map { vertex }
         }
     }
 }

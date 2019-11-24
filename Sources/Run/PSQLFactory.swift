@@ -1,3 +1,4 @@
+import Fluent
 import FluentPostgresDriver
 import Vapor
 import App
@@ -5,22 +6,18 @@ import App
 public struct PSQLFactory: DatabaseFactory {
     public let databaseId: DatabaseID = .psql
 
-    public func configure(_ s: inout Services) {
-        s.extend(Databases.self) { dbs, c in
-            try dbs.postgres(config: c.make())
-        }
+    public func configure(_ app: Application) {
+        app.databases.postgres(configuration: configuration,
+                               poolConfiguration: app.make(),
+                               on: app.make())
+    }
 
-        s.register(PostgresConfiguration.self) { c in
-            return .init(hostname: Environment.db.host,
-                         port: Environment.db.port,
-                         username: Environment.db.user,
-                         password: Environment.db.password,
-                         database: Environment.db.name)
-        }
-
-        s.register(Database.self) { c in
-            return try c.make(Databases.self).database(.psql)!
-        }
+    private var configuration: PostgresConfiguration {
+        return .init(hostname: Environment.db.host,
+                     port: Environment.db.port,
+                     username: Environment.db.user,
+                     password: Environment.db.password,
+                     database: Environment.db.name)
     }
 }
 

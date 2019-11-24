@@ -1,32 +1,31 @@
 import Fluent
 import Vapor
-import PostgresKit
 
-func routes(_ r: Routes, _ c: Container) throws {
-    r.get("health") { req in
+func routes(_ app: Application) throws {
+    app.get("health") { req in
         return "{ \"status\": \"UP\" }"
     }
 
-    try VertexController(db: c.make()).connect(r)
-    try RelationController(db: c.make()).connect(r)
+    VertexController().connect(app)
+    RelationController().connect(app)
 }
 
 extension VertexController {
-    func connect(_ r: Routes) {
-        r.get(Path.vertices, use: list)
-        r.post(Path.vertices, use: create)
-        r.get(Path.vertices, .parameter(Path.vertexId), use: get)
-        r.delete(Path.vertices, .parameter(Path.vertexId), use: delete)
-        r.patch(Path.vertices, .parameter(Path.vertexId), use: update)
+    func connect(_ app: Application) {
+        app.get(Path.vertices, use: list)
+        app.post(Path.vertices, use: create)
+        app.get(Path.vertices, .parameter(Path.vertexId), use: get)
+        app.delete(Path.vertices, .parameter(Path.vertexId), use: delete)
+        app.patch(Path.vertices, .parameter(Path.vertexId), use: update)
     }
 }
 
 extension RelationController {
-    func connect(_ r: Routes) {
-        r.get(Path.relations, use: list)
-        r.post(Path.relations, use: create)
-        r.get(Path.relations, .parameter(Path.relationId), use: get)
-        r.delete(Path.relations, .parameter(Path.relationId), use: delete)
-        r.patch(Path.relations, .parameter(Path.relationId), use: update)
+    func connect(_ app: Application) {
+        app.get(Path.relations, use: list)
+        app.post(Path.relations, use: create)
+        app.get(Path.relations, .parameter(Path.relationId), use: get)
+        app.delete(Path.relations, .parameter(Path.relationId), use: delete)
+        app.patch(Path.relations, .parameter(Path.relationId), use: update)
     }
 }

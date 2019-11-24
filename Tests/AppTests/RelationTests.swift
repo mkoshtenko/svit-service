@@ -6,8 +6,9 @@ import XCTest
 final class RelationTests: XCTVaporTestCase {
     func testAddRelation() throws {
         let relation = Relation(id: 1, type: "t", from: 1, to: 2, data: "")
-        try app.testable().start(method: .inMemory)
-            .manageDatabase() { db in
+
+        try app.testable()
+            .prepare {
                 try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
                 try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
         }
@@ -51,8 +52,9 @@ final class RelationTests: XCTVaporTestCase {
 
     func testRelationUpdateData() throws {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
-        try app.testable().start(method: .inMemory)
-            .manageDatabase() { db in
+
+        try app.testable()
+            .prepare {
                 try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
                 try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
                 try Relation(id: 1, type: "t", from: 1, to: 2, data: "").save(on: db).wait()
