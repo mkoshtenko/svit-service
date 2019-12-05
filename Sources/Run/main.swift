@@ -1,7 +1,12 @@
 import App
 import Vapor
 
-try app(context: Context(environment: try Environment.detect(),
+private func environment() throws -> Environment {
+    var env = try Environment.detect()
+    try LoggingSystem.bootstrap(from: &env)
+    return env
+}
+
+try app(context: Context(environment: environment(),
                          databaseFactory: PSQLFactory()))
     .run()
-
