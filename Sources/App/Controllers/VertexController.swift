@@ -1,13 +1,11 @@
 import Vapor
 import Fluent
 
-final class VertexController {
+struct VertexController {
     enum Path {
         static let vertices: PathComponent = "vertices"
         static let vertexId = "vertex_id"
     }
-
-    init() {}
 
     // TODO: remove list method
     func list(req: Request) throws -> EventLoopFuture<[Vertex]> {
