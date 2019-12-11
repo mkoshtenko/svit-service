@@ -7,9 +7,7 @@ public struct PSQLFactory: DatabaseFactory {
     public let databaseId: DatabaseID = .psql
 
     public func configure(_ app: Application) {
-        app.databases.postgres(configuration: configuration,
-                               poolConfiguration: app.make(),
-                               on: app.make())
+        app.databases.use(.postgres(configuration: configuration), as: .psql)
     }
 
     private var configuration: PostgresConfiguration {

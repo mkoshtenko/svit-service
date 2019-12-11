@@ -16,12 +16,8 @@ extension Application {
     }
 
     func registerMigrations(_ factory: DatabaseFactory, _ handler: @escaping () -> [Migration]) {
-        register(Migrations.self) { c in
-            var migrations = Migrations()
-            for migration in handler() {
-                migrations.add(migration, to: factory.databaseId)
-            }
-            return migrations
+        for migration in handler() {
+            migrations.add(migration, to: factory.databaseId)
         }
     }
 }

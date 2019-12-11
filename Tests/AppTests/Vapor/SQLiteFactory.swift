@@ -9,14 +9,6 @@ public struct SQLiteFactory: DatabaseFactory {
     public let databaseId: DatabaseID = .sqlite
 
     public func configure(_ app: Application) {
-        app.databases.sqlite(
-            configuration: configuration,
-            threadPool: app.make(),
-            on: app.make()
-        )
-    }
-
-    private var configuration: SQLiteConfiguration {
-        return .init(storage: .connection(.file(path: SQLiteFactory.filePath)))
+        app.databases.use(.sqlite(configuration: .init(storage: .memory)), as: .sqlite, isDefault: true)
     }
 }

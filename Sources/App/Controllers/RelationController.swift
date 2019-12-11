@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-final class RelationController {
+struct RelationController {
     enum Path {
         static let relations: PathComponent = "relations"
         static let relationId = "relation_id"
