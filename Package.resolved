@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-postgres-driver.git",
         "state": {
           "branch": null,
-          "revision": "4a33a0fe2b21c4206596e5fc14038fd3a4ff2810",
-          "version": "2.0.0-beta.2"
+          "revision": "5d9b4ec8188c21d7d88a55d64f88e3031786fffd",
+          "version": "2.0.0-beta.2.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor/postgres-kit.git",
         "state": {
           "branch": null,
-          "revision": "a8538f38f10190084c4947cc0222aa6945312a6d",
-          "version": "2.0.0-beta.2.1"
+          "revision": "0943b3e76f0dbd656b82ae5978a06ff8ccbd0ca5",
+          "version": "2.0.0-beta.2.2"
         }
       },
       {

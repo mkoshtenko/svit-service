@@ -4,11 +4,11 @@ import XCTVapor
 @testable import App
 
 final class VertexTests: XCTVaporTestCase {
-
+    
     func testAddAndDeleteVertex() throws {
         let vertex1 = Vertex(id: 1, type: "type1", data: "")
         let vertex2 = Vertex(id: 2, type: "type2", data: "")
-
+        
         try app.test(.GET, "/vertices") { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.body.string, "[]")
@@ -41,7 +41,7 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.body.string, "[]")
         }
     }
-
+    
     func testVertexUpdate() throws {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
         let vertex = Vertex(id: 1, type: "type", data: "")
@@ -58,10 +58,10 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .badRequest)
         }
     }
-
+    
     func testDeleteVertexWithRelationTo() throws {
         let vertexToId = 2
-
+        
         try app.prepare {
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
             try Vertex(id: vertexToId, type: "t", data: "").save(on: db).wait()
