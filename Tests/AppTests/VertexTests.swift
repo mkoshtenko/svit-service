@@ -59,21 +59,19 @@ final class VertexTests: XCTVaporTestCase {
         }
     }
     
-    func testDeleteVertexWithRelationTo() throws {
-        let vertexToId = 2
+    func testDeleteVertexWithRelations() throws {
+        let vertexId = 2
         
         try app.prepare {
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try Vertex(id: vertexToId, type: "t", data: "").save(on: db).wait()
-            try Relation(id: 1, type: "t", from: 1, to: vertexToId, data: "").save(on: db).wait()
-        }.test(.DELETE, "/vertices/\(vertexToId)") { res in
+            try Vertex(id: vertexId, type: "t", data: "").save(on: db).wait()
+            try Relation(id: 1, type: "t1", from: 1, to: vertexId, data: "").save(on: db).wait()
+            try Relation(id: 2, type: "t2", from: vertexId, to: 1, data: "").save(on: db).wait()
+        }.test(.DELETE, "/vertices/\(vertexId)") { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(vertexToId)") { res in
+        }.test(.GET, "/vertices/\(vertexId)") { res in
             XCTAssertEqual(res.status, .notFound)
-        }.test(.GET, "/vertices/\(1)") { res in
-            XCTAssertEqual(res.status, .ok)
             // Verify relation was deleted
-            XCTAssertEqual(try Vertex.query(on: db).all().wait().count, 1)
             XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
         }
     }
