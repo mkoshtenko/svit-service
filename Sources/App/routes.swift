@@ -17,6 +17,8 @@ extension VertexController {
         app.get(Path.vertices, .parameter(Path.vertexId), use: get)
         app.delete(Path.vertices, .parameter(Path.vertexId), use: delete)
         app.patch(Path.vertices, .parameter(Path.vertexId), use: update)
+
+        app.get(Path.vertices, .parameter(Path.vertexId), Path.count, .parameter(Path.relationType), use: relationsCount)
     }
 }
 

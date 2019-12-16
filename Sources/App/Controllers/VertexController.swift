@@ -5,6 +5,8 @@ struct VertexController {
     enum Path {
         static let vertices: PathComponent = "vertices"
         static let vertexId = "vertex_id"
+        static let relationType = "type"
+        static let count: PathComponent = "count"
     }
 
     // TODO: remove list method
@@ -46,6 +48,19 @@ struct VertexController {
                 vertex.data = data
                 return vertex.update(on: req.db).map { vertex }
         }
+    }
+
+    func relationsCount(req: Request) throws -> EventLoopFuture<Int> {
+        guard let vertexId: Int = req.parameters.get(Path.vertexId) else {
+            throw Abort(.badRequest, reason: "vertex id is not found")
+        }
+
+        guard let type: String = req.parameters.get(Path.relationType) else {
+            throw Abort(.badRequest, reason: "Expected relation type")
+        }
+
+        return RelationCount.query(vertexId: vertexId, type: type, on: req.db)
+            .map { $0?.value ?? 0 }
     }
 }
 

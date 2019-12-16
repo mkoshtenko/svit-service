@@ -86,14 +86,12 @@ In vapor 4 db migration do not run automatically, to do so you have to execute:
 it takes configurations and migrations from `configure.swift` and will try to execute them. 
 
 ### 3. Launch  From the XCode
-1. Choose `Run` scheme against the Mac machine
-2. Hit `CMD+R`
+1. Create xcodeproj from repo with vapor cli `vapor xcode -y`
+2. Choose `Run` scheme against the Mac machine
+3. Hit `CMD+R`
 
 ## API usage examples
-### Vertex
-- list:
-`curl http://localhost:8080/vertices`   // will be removed.
-
+### VERTEX
 - create:
 `curl -H "Content-Type: application/json" -d '{"type":"test", "data":"{\"a\":1,\"b\":[]}"}' -X POST http://localhost:8080/vertices`
 
@@ -104,10 +102,6 @@ it takes configurations and migrations from `configure.swift` and will try to ex
 `curl -H "Content-Type: application/json" -d '{"data":"{\"a\":\"UPDATED\"}"}' -X PATCH http://localhost:8080/vertices/1`
 
 ### RELATION
-
-- list:
-`curl http://localhost:8080/relations`   // will be removed.
-
 - create:
 `curl -H "Content-Type: application/json" -d '{"type":"implements", "from": 1, "to": 2, "data":"{\"aa\":11}"}' -X POST http://localhost:8080/relations`
 

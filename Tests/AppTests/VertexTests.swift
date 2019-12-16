@@ -75,6 +75,16 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
         }
     }
+
+    func testRelationsCountZero() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+        }.test(.GET, "/vertices/\(10)/count/a") { res in
+            XCTAssertEqual(res.status, .notFound)
+        }.test(.GET, "/vertices/\(1)/count/a") { res in
+            XCTAssertEqual(res.status, .ok)
+        }
+    }
 }
 
 private extension XCTHTTPResponse {

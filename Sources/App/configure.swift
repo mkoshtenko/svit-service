@@ -8,8 +8,11 @@ func configure(app: Application, context: Context) throws {
     app.registerDatabase(context.databaseFactory)
 
     app.registerMigrations(context.databaseFactory) {
-        return [CreateVertex(),
-                CreateRelation()]
+        return [
+            CreateVertex(),
+            CreateRelation(),
+            CreateRelationCount()
+        ]
     }
 
     try routes(app)
