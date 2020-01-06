@@ -50,17 +50,17 @@ struct VertexController {
         }
     }
 
-    func relationsCount(req: Request) throws -> EventLoopFuture<Int> {
+    func relationsCount(req: Request) throws -> EventLoopFuture<RelationCount> {
         guard let vertexId: Int = req.parameters.get(Path.vertexId) else {
             throw Abort(.badRequest, reason: "vertex id is not found")
         }
 
         guard let type: String = req.parameters.get(Path.relationType) else {
-            throw Abort(.badRequest, reason: "Expected relation type")
+            throw Abort(.badRequest, reason: "relation type is not found")
         }
 
         return RelationCount.query(vertexId: vertexId, type: type, on: req.db)
-            .map { $0?.value ?? 0 }
+            .unwrap(or: Abort(.notFound, reason: "No relations for vertex with id \(vertexId)"))
     }
 }
 
