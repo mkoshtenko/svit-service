@@ -1,15 +1,27 @@
 ## Overview
 Storage for simple vertices inside table 
 
-## Run tests
-Update Vapor Toolbox
+## Dependencies
+If Vapor Toolbox is already installed skip to step 3.
+
+1. Install [homebrew](https://brew.sh), it will be used as package manager for Vapor toolbox. 
+
+2. Install Vapor Toolbox, it requires Swift 4.1 or higher
+```
+brew tap vapor/tap
+brew install vapor/tap/vapor
+```
+
+3. Update Vapor Toolbox
 `brew upgrade vapor`
 
-Updates dependencies
+4. Updates dependencies
 `vapor update`
 
 If you are experiencing problems with Swift Package Manager, sometimes cleaning can help.
 `vapor clean`
+
+## Run tests
 
 Open Xcode
 `vapor xcode -y`
