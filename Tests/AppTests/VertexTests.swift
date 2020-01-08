@@ -99,7 +99,7 @@ final class VertexTests: XCTVaporTestCase {
     }
 }
 
-private extension XCTHTTPResponse {
+extension XCTHTTPResponse {
     var vertex: Vertex? {
         guard let data = body.data else { return nil }
         return try? JSONDecoder().decode(Vertex.self, from: data)

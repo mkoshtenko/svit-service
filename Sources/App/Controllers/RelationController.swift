@@ -19,6 +19,7 @@ struct RelationController {
             .flatMap { _ in Vertex.find(relation.to, on: req.db) }
             .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.to) not found"))
             .flatMap { _ in relation.save(on: req.db) }
+            .flatMap { _ in RelationCount.incrementCount(vertexId: relation.from, type: relation.type, on: req.db) }
             .map { relation }
     }
 

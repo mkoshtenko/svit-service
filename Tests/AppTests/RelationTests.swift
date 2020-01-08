@@ -52,6 +52,32 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .badRequest, "'data' field not found")
         }
     }
+
+    func testAddRelationIncrementsCount() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "", data: "").save(on: db).wait()
+            try Vertex(id: 2, type: "", data: "").save(on: db).wait()
+            try Vertex(id: 3, type: "", data: "").save(on: db).wait()
+        }.test(.GET, "/relations") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.body.string, "[]")
+        }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 2, data: "")) { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.GET, "/vertices/\(1)/count/t1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 1))
+        }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.GET, "/vertices/\(1)/count/t1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 2))
+        }.test(.POST, "/relations", json: Relation(type: "t2", from: 1, to: 2, data: "")) { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.GET, "/vertices/\(1)/count/t2") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t2", count: 1))
+        }
+    }
 }
 
 private extension XCTHTTPResponse {
