@@ -10,11 +10,11 @@ extension RelationCount {
 
     static func decrementCount(vertexId: Int, type: String, on db: Database) -> EventLoopFuture<Void> {
         return update(vertexId: vertexId, type: type, on: db) {
-            return $0 + 1
+            return $0 - 1
         }
     }
 
-    static func update(vertexId: Int, type: String, on db: Database, map: @escaping (Int) -> Int) -> EventLoopFuture<Void> {
+    private static func update(vertexId: Int, type: String, on db: Database, map: @escaping (Int) -> Int) -> EventLoopFuture<Void> {
         return query(vertexId: vertexId, type: type, on: db)
             .flatMap { relationCount in
                 if let count = relationCount {

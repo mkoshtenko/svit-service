@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-final class RelationCount: Model, Content {
+final class RelationCount: Model {
     static let schema = "count"
 
     @ID(key: "id")
@@ -26,11 +26,14 @@ final class RelationCount: Model, Content {
     }
 }
 
-extension RelationCount: Equatable {
-    static func == (lhs: RelationCount, rhs: RelationCount) -> Bool {
-        guard lhs !== rhs else { return true }
-        return lhs.id == rhs.id
-            && lhs.type == rhs.type
-            && lhs.from == rhs.from
+extension RelationCount: PublicConvertible {
+    struct Public: Equatable, Content {
+        let from: Int
+        let type: String
+        let count: Int
+    }
+
+    var publicContent: Public {
+        return Public(from: from, type: type, count: value)
     }
 }
