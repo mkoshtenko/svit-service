@@ -33,7 +33,8 @@ struct RelationController {
         let relationId: Int? = req.parameters.get(Path.relationId)
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
-            .flatMap { $0.delete(on: req.db) }
+            .flatMap { relation in relation.delete(on: req.db).map { relation } }
+            .flatMap { relation in RelationCount.decrementCount(vertexId: relation.from, type: relation.type, on: req.db) }
             .map { .ok }
     }
 

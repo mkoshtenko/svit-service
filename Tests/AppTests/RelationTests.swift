@@ -63,9 +63,6 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.body.string, "[]")
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(1)/count/t1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 1))
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.GET, "/vertices/\(1)/count/t1") { res in
@@ -76,6 +73,31 @@ final class RelationTests: XCTVaporTestCase {
         }.test(.GET, "/vertices/\(1)/count/t2") { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t2", count: 1))
+        }
+    }
+
+    func testDeleteRelationDecrementsCount() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "", data: "").save(on: db).wait()
+            try Vertex(id: 2, type: "", data: "").save(on: db).wait()
+            try Vertex(id: 3, type: "", data: "").save(on: db).wait()
+        }.test(.POST, "/relations", json: Relation(id: 1, type: "t1", from: 1, to: 2, data: "")) { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.POST, "/relations", json: Relation(id: 2, type: "t1", from: 1, to: 3, data: "")) { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.GET, "/vertices/\(1)/count/t1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 2))
+        }.test(.DELETE, "/relations/\(1)") { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.GET, "/vertices/\(1)/count/t1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 1))
+        }.test(.DELETE, "/relations/\(2)") { res in
+            XCTAssertEqual(res.status, .ok)
+        }.test(.GET, "/vertices/\(1)/count/t1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 0))
         }
     }
 }
