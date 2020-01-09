@@ -19,6 +19,9 @@ extension RelationCount {
             .flatMap { relationCount in
                 if let count = relationCount {
                     count.value = map(count.value)
+                    if count.value <= 0 {
+                        return count.delete(on: db)
+                    }
                     return count.update(on: db)
                 }
                 let count = RelationCount(type: type, from: vertexId, value: map(0))
