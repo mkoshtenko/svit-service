@@ -82,7 +82,8 @@ final class VertexTests: XCTVaporTestCase {
         }.test(.GET, "/vertices/\(10)/count/a") { res in
             XCTAssertEqual(res.status, .notFound)
         }.test(.GET, "/vertices/\(1)/count/a") { res in
-            XCTAssertEqual(res.status, .notFound)
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "a", count: 0))
         }
     }
 
@@ -94,7 +95,7 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 1))
         }.test(.GET, "/vertices/\(1)/count/t2") { res in
-            XCTAssertEqual(res.status, .notFound)
+            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t2", count: 0))
         }
     }
 }

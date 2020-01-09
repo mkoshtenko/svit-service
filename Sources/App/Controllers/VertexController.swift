@@ -60,8 +60,8 @@ struct VertexController {
         }
 
         return RelationCount.query(vertexId: vertexId, type: type, on: req.db)
-            .unwrap(or: Abort(.notFound, reason: "No relations for vertex with id \(vertexId)"))
-            .convertToPublic()
+            // Returns public structure with `0` count if there are no relations found
+            .convertToPublic(default: RelationCount.Public(from: vertexId, type: type, count: 0))
     }
 }
 
