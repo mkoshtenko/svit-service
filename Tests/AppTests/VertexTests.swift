@@ -74,19 +74,12 @@ final class VertexTests: XCTVaporTestCase {
             // Verify relation was deleted
             XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
         }
-    }
-
-    
+    }    
 }
 
 extension XCTHTTPResponse {
     var vertex: Vertex? {
         guard let data = body.data else { return nil }
         return try? JSONDecoder().decode(Vertex.self, from: data)
-    }
-
-    var relationCount: RelationCount.Public? {
-        guard let data = body.data else { return nil }
-        return try? JSONDecoder().decode(RelationCount.Public.self, from: data)
     }
 }
