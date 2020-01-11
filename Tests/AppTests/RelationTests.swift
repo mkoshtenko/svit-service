@@ -12,9 +12,6 @@ final class RelationTests: XCTVaporTestCase {
         try app.prepare {
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
             try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
-        }.test(.GET, "/relations") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.body.string, "[]")
         }.test(.POST, "/relations", json: Relation(type: "t", from: 100, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .notFound)
         }.test(.POST, "/relations", json: Relation(type: "t", from: 1, to: 200, data: "")) { res in
@@ -58,9 +55,6 @@ final class RelationTests: XCTVaporTestCase {
             try Vertex(id: 1, type: "", data: "").save(on: db).wait()
             try Vertex(id: 2, type: "", data: "").save(on: db).wait()
             try Vertex(id: 3, type: "", data: "").save(on: db).wait()
-        }.test(.GET, "/relations") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.body.string, "[]")
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in
