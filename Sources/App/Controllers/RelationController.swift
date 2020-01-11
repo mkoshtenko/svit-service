@@ -2,11 +2,6 @@ import Vapor
 import Fluent
 
 struct RelationController {
-    enum Path {
-        static let relations: PathComponent = "relations"
-        static let relationId = "relation_id"
-    }
-
     // TODO: remove list method
     func list(req: Request) throws -> EventLoopFuture<[Relation]> {
         return Relation.query(on: req.db).all()
@@ -24,13 +19,13 @@ struct RelationController {
     }
 
     func get(req: Request) throws -> EventLoopFuture<Relation> {
-        let relationId: Int? = req.parameters.get(Path.relationId)
+        let relationId: Int? = req.parameters.get(Path.Relations.id)
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        let relationId: Int? = req.parameters.get(Path.relationId)
+        let relationId: Int? = req.parameters.get(Path.Relations.id)
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in relation.delete(on: req.db).map { relation } }
@@ -43,7 +38,7 @@ struct RelationController {
             throw Abort(.badRequest, reason: "'data' field is missing")
         }
 
-        let relationId: Int? = req.parameters.get(Path.relationId)
+        let relationId: Int? = req.parameters.get(Path.Relations.id)
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in

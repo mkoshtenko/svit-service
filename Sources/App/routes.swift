@@ -1,33 +1,51 @@
 import Fluent
 import Vapor
 
+enum Path {
+    static let vertices: PathComponent = "vertices"
+    enum Vertices {
+        static let id = "vertex_id"
+    }
+
+    static let relations: PathComponent = "relations"
+    enum Relations {
+        static let id = "relation_id"
+        static let to = "relation_to"
+        static let from = "relation_from"
+        static let type = "relation_type"
+    }
+
+    static let relationCount: PathComponent = "count"
+}
+
 func routes(_ app: Application) throws {
     app.get("health") { req in
         return "{ \"status\": \"UP\" }"
     }
 
-    VertexController().connect(app)
-    RelationController().connect(app)
+    app.connect(VertexController())
+    app.connect(RelationController())
+    app.connect(RelationCountController())
 }
 
-extension VertexController {
-    func connect(_ app: Application) {
-        app.get(Path.vertices, use: list)
-        app.post(Path.vertices, use: create)
-        app.get(Path.vertices, .parameter(Path.vertexId), use: get)
-        app.delete(Path.vertices, .parameter(Path.vertexId), use: delete)
-        app.patch(Path.vertices, .parameter(Path.vertexId), use: update)
-
-        app.get(Path.vertices, .parameter(Path.vertexId), Path.count, .parameter(Path.relationType), use: relationsCount)
+extension Application {
+    func connect(_ controller: VertexController) {
+        get(Path.vertices, use: controller.list)
+        post(Path.vertices, use: controller.create)
+        get(Path.vertices, .parameter(Path.Vertices.id), use: controller.get)
+        delete(Path.vertices, .parameter(Path.Vertices.id), use: controller.delete)
+        patch(Path.vertices, .parameter(Path.Vertices.id), use: controller.update)
     }
-}
 
-extension RelationController {
-    func connect(_ app: Application) {
-        app.get(Path.relations, use: list)
-        app.post(Path.relations, use: create)
-        app.get(Path.relations, .parameter(Path.relationId), use: get)
-        app.delete(Path.relations, .parameter(Path.relationId), use: delete)
-        app.patch(Path.relations, .parameter(Path.relationId), use: update)
+    func connect(_ controller: RelationController) {
+        get(Path.relations, use: controller.list)
+        post(Path.relations, use: controller.create)
+        get(Path.relations, .parameter(Path.Relations.id), use: controller.get)
+        delete(Path.relations, .parameter(Path.Relations.id), use: controller.delete)
+        patch(Path.relations, .parameter(Path.Relations.id), use: controller.update)
+    }
+
+    func connect(_ controller: RelationCountController) {
+        get(Path.relationCount, use: controller.get)
     }
 }

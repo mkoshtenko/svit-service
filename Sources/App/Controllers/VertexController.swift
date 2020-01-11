@@ -2,31 +2,28 @@ import Vapor
 import Fluent
 
 struct VertexController {
-    enum Path {
-        static let vertices: PathComponent = "vertices"
-        static let vertexId = "vertex_id"
-        static let relationType = "type"
-        static let count: PathComponent = "count"
-    }
-
     // TODO: remove list method
     func list(req: Request) throws -> EventLoopFuture<[Vertex]> {
         return Vertex.query(on: req.db).all()
     }
 
     func create(req: Request) throws -> EventLoopFuture<Vertex> {
+        // TODO: Add validation for Vertex with Validatable protocol
+//        let decoder = try URLEncodedFormDecoder().decode(DecoderUnwrapper.self, from: req.url)
+//        try Vertex.validate(decoder.decoder)
+
         let vertex = try req.content.decode(Vertex.self)
         return vertex.save(on: req.db).map { vertex }
     }
 
     func get(req: Request) throws -> EventLoopFuture<Vertex> {
-        let vertexId: Int? = req.parameters.get(Path.vertexId)
+        let vertexId: Int? = req.parameters.get(Path.Vertices.id)
         return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let vertexId: Int = req.parameters.get(Path.vertexId) else {
+        guard let vertexId: Int = req.parameters.get(Path.Vertices.id) else {
             throw Abort(.badRequest, reason: "Cannot find 'vertexId' in the path")
         }
 
@@ -41,27 +38,13 @@ struct VertexController {
             throw Abort(.badRequest, reason: "'data' field is missing")
         }
 
-        let vertexId: Int? = req.parameters.get(Path.vertexId)
+        let vertexId: Int? = req.parameters.get(Path.Vertices.id)
         return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { vertex in
                 vertex.data = data
                 return vertex.update(on: req.db).map { vertex }
         }
-    }
-
-    func relationsCount(req: Request) throws -> EventLoopFuture<RelationCount.Public> {
-        guard let vertexId: Int = req.parameters.get(Path.vertexId) else {
-            throw Abort(.badRequest, reason: "vertex id is not found")
-        }
-
-        guard let type: String = req.parameters.get(Path.relationType) else {
-            throw Abort(.badRequest, reason: "relation type is not found")
-        }
-
-        return RelationCount.query(vertexId: vertexId, type: type, on: req.db)
-            // Returns public structure with `0` count if there are no relations found
-            .convertToPublic(default: RelationCount.Public(from: vertexId, type: type, count: 0))
     }
 }
 

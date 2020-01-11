@@ -76,28 +76,7 @@ final class VertexTests: XCTVaporTestCase {
         }
     }
 
-    func testRelationsCountReturnsNotFound() throws {
-        try app.prepare {
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-        }.test(.GET, "/vertices/\(10)/count/a") { res in
-            XCTAssertEqual(res.status, .notFound)
-        }.test(.GET, "/vertices/\(1)/count/a") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "a", count: 0))
-        }
-    }
-
-    func testRelationsCountReturnsObject() throws {
-        try app.prepare {
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try RelationCount(id: 1, type: "t1", from: 1, value: 1).save(on: db).wait()
-        }.test(.GET, "/vertices/\(1)/count/t1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 1))
-        }.test(.GET, "/vertices/\(1)/count/t2") { res in
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t2", count: 0))
-        }
-    }
+    
 }
 
 extension XCTHTTPResponse {

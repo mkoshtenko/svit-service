@@ -1,6 +1,20 @@
 import Vapor
 import Fluent
 
+struct RelationCountController {
+    struct Query: Codable {
+        let from: Int
+        let type: String
+    }
+
+    func get(req: Request) throws -> EventLoopFuture<RelationCount.Public> {
+        let query = try req.query.decode(Query.self)
+        return RelationCount.find(vertexId: query.from, type: query.type, on: req.db)
+            // Returns public structure with `0` count if there are no relations found
+            .convertToPublic(default: RelationCount.Public(from: query.from, type: query.type, count: 0))
+    }
+}
+
 extension RelationCount {
     static func incrementCount(vertexId: Int, type: String, on db: Database) -> EventLoopFuture<Void> {
         return update(vertexId: vertexId, type: type, on: db) {
@@ -15,7 +29,7 @@ extension RelationCount {
     }
 
     private static func update(vertexId: Int, type: String, on db: Database, map: @escaping (Int) -> Int) -> EventLoopFuture<Void> {
-        return query(vertexId: vertexId, type: type, on: db)
+        return find(vertexId: vertexId, type: type, on: db)
             .flatMap { relationCount in
                 if let count = relationCount {
                     count.value = map(count.value)
@@ -29,7 +43,7 @@ extension RelationCount {
         }
     }
 
-    static func query(vertexId: Int, type: String, on db: Database) -> EventLoopFuture<RelationCount?> {
+    static func find(vertexId: Int, type: String, on db: Database) -> EventLoopFuture<RelationCount?> {
         return Vertex.find(vertexId, on: db)
             .unwrap(or: Abort(.notFound, reason: "Vertex with id \(vertexId) not found"))
             .flatMap { _ in

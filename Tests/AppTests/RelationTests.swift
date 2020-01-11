@@ -65,14 +65,14 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(1)/count/t1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 2))
+        }.prepare {
+            XCTAssertEqual(try RelationCount.query(on: db).all().wait().count, 1, "Single count entity for same relation type")
+            XCTAssertEqual(try RelationCount.find(vertexId: 1, type: "t1", on: db).wait()?.value, 2)
         }.test(.POST, "/relations", json: Relation(type: "t2", from: 1, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(1)/count/t2") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t2", count: 1))
+        }.prepare {
+            XCTAssertEqual(try RelationCount.query(on: db).all().wait().count, 2, "Each relation type has own count")
+            XCTAssertEqual(try RelationCount.find(vertexId: 1, type: "t2", on: db).wait()?.value, 1)
         }
     }
 
@@ -85,19 +85,18 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
         }.test(.POST, "/relations", json: Relation(id: 2, type: "t1", from: 1, to: 3, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(1)/count/t1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 2))
+        }.prepare {
+            XCTAssertEqual(try RelationCount.query(on: db).all().wait().count, 1, "Single count entity for same relation type")
+            XCTAssertEqual(try RelationCount.find(vertexId: 1, type: "t1", on: db).wait()?.value, 2)
         }.test(.DELETE, "/relations/\(1)") { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(1)/count/t1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 1))
+        }.prepare {
+            XCTAssertEqual(try RelationCount.query(on: db).all().wait().count, 1, "Only one relation and one count")
+            XCTAssertEqual(try RelationCount.find(vertexId: 1, type: "t1", on: db).wait()?.value, 1)
         }.test(.DELETE, "/relations/\(2)") { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/vertices/\(1)/count/t1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 0))
+        }.prepare {
+            XCTAssertEqual(try RelationCount.query(on: db).all().wait().count, 0, "Count entity has been removed")
         }
     }
 }
