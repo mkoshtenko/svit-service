@@ -2,12 +2,9 @@ import Vapor
 import Fluent
 
 struct RelationController {
-    // TODO: remove list method
-    func list(req: Request) throws -> EventLoopFuture<[Relation]> {
-        return Relation.query(on: req.db).all()
-    }
-
     func create(req: Request) throws -> EventLoopFuture<Relation> {
+        // TODO: Add validation for Relation with Validatable protocol
+
         let relation = try req.content.decode(Relation.self)
         return Vertex.find(relation.from, on: req.db)
             .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.from) not found"))
@@ -18,22 +15,9 @@ struct RelationController {
             .map { relation }
     }
 
-    func get(req: Request) throws -> EventLoopFuture<Relation> {
-        let relationId: Int? = req.parameters.get(Path.Relations.id)
-        return Relation.find(relationId, on: req.db)
-            .unwrap(or: Abort(.notFound))
-    }
-
-    func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        let relationId: Int? = req.parameters.get(Path.Relations.id)
-        return Relation.find(relationId, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap { relation in relation.delete(on: req.db).map { relation } }
-            .flatMap { relation in RelationCount.decrementCount(vertexId: relation.from, type: relation.type, on: req.db) }
-            .map { .ok }
-    }
-
     func update(req: Request) throws -> EventLoopFuture<Relation> {
+        // TODO: Add validation for Relation with Validatable protocol
+
         guard let data = try req.content.decode([String: String].self)["data"] else {
             throw Abort(.badRequest, reason: "'data' field is missing")
         }
@@ -45,5 +29,27 @@ struct RelationController {
                 relation.data = data
                 return relation.update(on: req.db).map { relation }
         }
+    }
+
+    func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        let relationId: Int? = req.parameters.get(Path.Relations.id)
+        return Relation.find(relationId, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { relation in relation.delete(on: req.db).map { relation } }
+            .flatMap { relation in RelationCount.decrementCount(vertexId: relation.from, type: relation.type, on: req.db) }
+            .map { .ok }
+    }
+}
+
+// TODO: remove these methods, they are for debugging only
+extension RelationController {
+    func list(req: Request) throws -> EventLoopFuture<[Relation]> {
+        return Relation.query(on: req.db).all()
+    }
+
+    func get(req: Request) throws -> EventLoopFuture<Relation> {
+        let relationId: Int? = req.parameters.get(Path.Relations.id)
+        return Relation.find(relationId, on: req.db)
+            .unwrap(or: Abort(.notFound))
     }
 }
