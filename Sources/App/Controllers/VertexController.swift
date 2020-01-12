@@ -9,10 +9,7 @@ struct VertexController {
     }
 
     func create(req: Request) throws -> EventLoopFuture<Vertex> {
-        // TODO: Add validation for Vertex with Validatable protocol
-//        let decoder = try URLEncodedFormDecoder().decode(DecoderUnwrapper.self, from: req.url)
-//        try Vertex.validate(decoder.decoder)
-
+        try Vertex.validate(req)
         let vertex = try req.content.decode(Vertex.self)
         return vertex.save(on: req.db).map { vertex }
     }

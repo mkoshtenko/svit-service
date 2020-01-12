@@ -4,7 +4,16 @@ import XCTVapor
 @testable import App
 
 final class VertexTests: XCTVaporTestCase {
-    
+
+    func testCreateVertex() throws {
+        try app.test(.POST, "/vertices", json: Vertex(type: "a", data: "")) { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqualJSON(res.body.string, Vertex(id: 1, type: "a", data: ""))
+        }.test(.POST, "/vertices", json: Vertex(type: "", data: "")) { res in
+            XCTAssertEqual(res.status, .internalServerError)
+        }
+    }
+
     func testAddAndDeleteVertex() throws {
         let vertex1 = Vertex(id: 1, type: "type1", data: "")
         let vertex2 = Vertex(id: 2, type: "type2", data: "")
@@ -77,7 +86,7 @@ final class VertexTests: XCTVaporTestCase {
     }    
 }
 
-extension XCTHTTPResponse {
+private extension XCTHTTPResponse {
     var vertex: Vertex? {
         guard let data = body.data else { return nil }
         return try? JSONDecoder().decode(Vertex.self, from: data)

@@ -28,3 +28,9 @@ extension Vertex: Equatable {
         return lhs.id == rhs.id && lhs.type == rhs.type && lhs.data == rhs.data
     }
 }
+
+extension Vertex: Validatable {
+    static func validations(_ validations: inout Validations) {
+        validations.add("type", is: .alphanumeric && !.empty)
+    }
+}

@@ -27,7 +27,7 @@ final class RelationCountTests: XCTVaporTestCase {
     }
 }
 
-extension XCTHTTPResponse {
+private extension XCTHTTPResponse {
     var relationCount: RelationCount.Public? {
         guard let data = body.data else { return nil }
         return try? JSONDecoder().decode(RelationCount.Public.self, from: data)
