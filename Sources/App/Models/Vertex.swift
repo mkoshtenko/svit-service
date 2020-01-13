@@ -31,6 +31,8 @@ extension Vertex: Equatable {
 
 extension Vertex: Validatable {
     static func validations(_ validations: inout Validations) {
+        // Type can only contain the characters in Unicode General Categories L*, M*, and N*
+        // and should not be empty.
         validations.add("type", is: .alphanumeric && !.empty)
     }
 }
