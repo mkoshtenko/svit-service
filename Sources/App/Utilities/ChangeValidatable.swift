@@ -7,14 +7,22 @@ protocol ChangeValidatable: Validatable {
 
 extension ChangeValidatable {
     static func validateCreation(_ request: Request) throws {
-        var validations = self.validations()
-        validationsForCreate(&validations)
-        try validations.validate(request).assert()
+        try validationsForCreate().validate(request).assert()
     }
 
     static func validateUpdate(_ request: Request) throws {
-        var validations = self.validations()
+        try validationsForUpdate().validate(request).assert()
+    }
+
+    static func validationsForCreate() -> Validations {
+        var validations = Validations()
+        validationsForCreate(&validations)
+        return validations
+    }
+
+    static func validationsForUpdate() -> Validations {
+        var validations = Validations()
         validationsForUpdate(&validations)
-        try validations.validate(request).assert()
+        return validations
     }
 }

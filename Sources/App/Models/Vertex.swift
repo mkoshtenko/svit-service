@@ -30,9 +30,14 @@ extension Vertex: Equatable {
 }
 
 extension Vertex: Validatable {
+    /**
+     This method contains common validations for the entity.
+     */
     static func validations(_ validations: inout Validations) {
-        // Type can only contain the characters in Unicode General Categories L*, M*, and N*
-        // and should not be empty.
+        // Does not accept an id from create request
+        validations.add("id", is: Validator<Optional<Int>>.nil)
+
+        // The type is a string and should not be empty when creating new entity.
         validations.add("type", is: .alphanumeric && !.empty)
     }
 }
