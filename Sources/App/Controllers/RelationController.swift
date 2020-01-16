@@ -15,17 +15,15 @@ struct RelationController {
     }
 
     func update(req: Request) throws -> EventLoopFuture<Relation> {
-        // TODO: Add validation for Relation with Validatable protocol
-
-        guard let data = try req.content.decode([String: String].self)["data"] else {
-            throw Abort(.badRequest, reason: "'data' field is missing")
+        guard let relationId: Relation.IDValue = req.parameters.get(Path.Relations.id) else {
+            throw Abort(.badRequest, reason: "Cannot find 'relationId' in the path")
         }
+        let relationUpdate = try req.content.decode(Relation.Update.self)
 
-        let relationId: Int? = req.parameters.get(Path.Relations.id)
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in
-                relation.data = data
+                relation.data = relationUpdate.data
                 return relation.update(on: req.db).map { relation }
         }
     }
