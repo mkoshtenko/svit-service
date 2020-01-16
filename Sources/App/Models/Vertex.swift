@@ -22,6 +22,17 @@ final class Vertex: Model, Content {
     }
 }
 
+extension Vertex {
+    /**
+     This structure is used for update requests
+
+     After a Vertex is created we cannot change its type or id therefore we use this structure with only data field
+     */
+    struct Update: Content {
+        var data: String
+    }
+}
+
 extension Vertex: Equatable {
     static func == (lhs: Vertex, rhs: Vertex) -> Bool {
         guard lhs !== rhs else { return true }
@@ -31,7 +42,7 @@ extension Vertex: Equatable {
 
 extension Vertex: Validatable {
     /**
-     This method contains common validations for the entity.
+     This method contains common validations for entity's create request.
      */
     static func validations(_ validations: inout Validations) {
         // Does not accept an id from create request

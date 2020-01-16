@@ -15,17 +15,16 @@ struct VertexController {
     }
 
     func update(req: Request) throws -> EventLoopFuture<Vertex> {
-        // TODO: Add validation for Vertex with Validatable protocol
+        let vertexUpdate = try req.content.decode(Vertex.Update.self)
 
-        guard let data = try req.content.decode([String: String].self)["data"] else {
-            throw Abort(.badRequest, reason: "'data' field is missing")
+        guard let vertexId: Int = req.parameters.get(Path.Vertices.id) else {
+            throw Abort(.badRequest, reason: "Cannot find 'vertexId' in the path")
         }
 
-        let vertexId: Int? = req.parameters.get(Path.Vertices.id)
         return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { vertex in
-                vertex.data = data
+                vertex.data = vertexUpdate.data
                 return vertex.update(on: req.db).map { vertex }
         }
     }
