@@ -15,11 +15,8 @@ struct VertexController {
     }
 
     func update(req: Request) throws -> EventLoopFuture<Vertex> {
+        let vertexId = try req.parameters.unwrapVertexId()
         let vertexUpdate = try req.content.decode(Vertex.Update.self)
-
-        guard let vertexId: Int = req.parameters.get(Path.Vertices.id) else {
-            throw Abort(.badRequest, reason: "Cannot find 'vertexId' in the path")
-        }
 
         return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
@@ -30,14 +27,21 @@ struct VertexController {
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let vertexId: Int = req.parameters.get(Path.Vertices.id) else {
-            throw Abort(.badRequest, reason: "Cannot find 'vertexId' in the path")
-        }
+        let vertexId = try req.parameters.unwrapVertexId()
 
         return Vertex.find(vertexId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .deleteWithAllRelations(on: req.db)
             .map { .ok }
+    }
+}
+
+private extension Parameters {
+    func unwrapVertexId() throws -> Vertex.IDValue {
+        guard let vertexId: Vertex.IDValue = get(Path.Vertices.id) else {
+            throw Abort(.badRequest, reason: "Cannot find 'vertexId' in the path")
+        }
+        return vertexId
     }
 }
 
