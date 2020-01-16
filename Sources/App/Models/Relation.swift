@@ -30,6 +30,18 @@ final class Relation: Model, Content {
     }
 }
 
+extension Relation {
+    /**
+     This structure is used for update requests
+
+     When Relation entity is created we cannot change its 'type', 'id', 'from' or 'to' fields,
+     therefore we use this structure with only the data field required.
+     */
+    struct Update: Content {
+        var data: String
+    }
+}
+
 extension Relation: Equatable {
     static func == (lhs: Relation, rhs: Relation) -> Bool {
         guard lhs !== rhs else { return true }
@@ -38,5 +50,18 @@ extension Relation: Equatable {
             && lhs.from == rhs.from
             && lhs.to == rhs.to
             && lhs.data == rhs.data
+    }
+}
+
+extension Relation: Validatable {
+    /**
+     This method contains common validations for create requests.
+     */
+    static func validations(_ validations: inout Validations) {
+        // Does not accept an id from create request
+        validations.add("id", is: Validator<Optional<Int>>.nil)
+
+        // The type is a string and should not be empty when creating new entity.
+        validations.add("type", is: .alphanumeric && !.empty)
     }
 }

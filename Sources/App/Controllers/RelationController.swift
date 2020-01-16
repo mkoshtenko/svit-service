@@ -3,8 +3,7 @@ import Fluent
 
 struct RelationController {
     func create(req: Request) throws -> EventLoopFuture<Relation> {
-        // TODO: Add validation for Relation with Validatable protocol
-
+        try Relation.validate(req)
         let relation = try req.content.decode(Relation.self)
         return Vertex.find(relation.from, on: req.db)
             .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.from) not found"))

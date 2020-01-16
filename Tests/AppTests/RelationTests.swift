@@ -7,7 +7,7 @@ import XCTVapor
 final class RelationTests: XCTVaporTestCase {
 
     func testRelationLifecycle() throws {
-        let relation = Relation(id: 1, type: "t", from: 1, to: 2, data: "")
+        let relation = Relation(type: "t", from: 1, to: 2, data: "")
 
         try app.prepare {
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
@@ -18,13 +18,11 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .notFound)
         }.test(.POST, "/relations", json: relation) { res in
             XCTAssertEqual(res.status, .ok)
-            XCTAssertEqualJSON(res.body.string, relation)
-        }.test(.GET, "/relations/\(relation.id!)") { res in
+        }.test(.GET, "/relations/\(1)") { res in
             XCTAssertEqual(res.status, .ok)
-            XCTAssertEqualJSON(res.body.string, relation)
-        }.test(.DELETE, "/relations/\(relation.id!)") { res in
+        }.test(.DELETE, "/relations/\(1)") { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.GET, "/relations/\(relation.id!)") { res in
+        }.test(.GET, "/relations/\(1)") { res in
             XCTAssertEqual(res.status, .notFound)
         }.test(.GET, "/relations") { res in
             XCTAssertEqual(res.status, .ok)
@@ -75,9 +73,9 @@ final class RelationTests: XCTVaporTestCase {
             try Vertex(id: 1, type: "", data: "").save(on: db).wait()
             try Vertex(id: 2, type: "", data: "").save(on: db).wait()
             try Vertex(id: 3, type: "", data: "").save(on: db).wait()
-        }.test(.POST, "/relations", json: Relation(id: 1, type: "t1", from: 1, to: 2, data: "")) { res in
+        }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
-        }.test(.POST, "/relations", json: Relation(id: 2, type: "t1", from: 1, to: 3, data: "")) { res in
+        }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
         }.prepare {
             XCTAssertEqual(try RelationCount.query(on: db).all().wait().count, 1, "Single count entity for same relation type")
