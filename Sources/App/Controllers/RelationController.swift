@@ -2,6 +2,9 @@ import Vapor
 import Fluent
 
 struct RelationController {
+    /**
+     For now `to` and `type` are mutually exclusive, only one of them can be used at the time.
+     */
     struct Query: Codable {
         let from: Int
         let to: Int?
@@ -10,7 +13,7 @@ struct RelationController {
 
     func getFromVertex(req: Request) throws -> EventLoopFuture<[Relation]> {
         let query = try req.query.decode(Query.self)
-        return Relation.find(fromId: query.from, toId: query.to, type: query.type, on: req.db)
+        return try Relation.find(fromId: query.from, toId: query.to, type: query.type, on: req.db)
     }
 
     func create(req: Request) throws -> EventLoopFuture<Relation> {
@@ -57,7 +60,15 @@ extension RelationController {
 }
 
 private extension Relation {
-    static func find(fromId: Int, toId: Int?, type: String?, on db: Database) -> EventLoopFuture<[Relation]> {
+    static func find(fromId: Int, toId: Int?, type: String?, on db: Database) throws -> EventLoopFuture<[Relation]> {
+        guard toId != nil || type != nil else {
+            throw Abort(.badRequest, reason: "'to' XOR 'type' must be added to the request")
+        }
+
+        // Relations can be filtered with either toId or type, both are not allowed
+        guard (toId == nil && type != nil) || (toId != nil && type == nil) else {
+            throw Abort(.badRequest, reason: "'to' and 'type' are mutually exclusive")
+        }
         return Vertex.find(fromId, on: db)
             .unwrap(or: Abort(.notFound, reason: "Vertex with id \(fromId) not found"))
             .flatMap { _ in

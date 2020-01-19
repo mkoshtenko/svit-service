@@ -5,18 +5,14 @@ import XCTVapor
 
 
 final class RelationTests: XCTVaporTestCase {
-
     func testGetRelationsFromVertexWithType() throws {
         try app.prepare {
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 10, data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 20, data: "").save(on: db).wait()
             try Relation(type: "t1", from: 1, to: 30, data: "").save(on: db).wait()
-        }.test(.GET, "/relations?from=10") { res in
-            XCTAssertEqual(res.status, .notFound)
         }.test(.GET, "/relations?from=1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relations.count, 3)
+            XCTAssertEqual(res.status, .badRequest)
         }.test(.GET, "/relations?from=1&type=t") { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.relations.count, 2)
@@ -35,11 +31,8 @@ final class RelationTests: XCTVaporTestCase {
             try Relation(type: "t", from: 1, to: 10, data: "").save(on: db).wait()
             try Relation(type: "t1", from: 1, to:10, data: "").save(on: db).wait()
             try Relation(type: "t2", from: 1, to: 20, data: "").save(on: db).wait()
-        }.test(.GET, "/relations?from=10") { res in
-            XCTAssertEqual(res.status, .notFound)
         }.test(.GET, "/relations?from=1") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relations.count, 3)
+            XCTAssertEqual(res.status, .badRequest)
         }.test(.GET, "/relations?from=1&to=10") { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.relations.count, 2)
@@ -49,6 +42,17 @@ final class RelationTests: XCTVaporTestCase {
         }.test(.GET, "/relations?from=1&to=100") { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.relations.count, 0)
+        }
+    }
+
+    func testGetRelationsFromVertexWithTypeToVertexNotAllowed() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try Relation(type: "t", from: 1, to: 2, data: "").save(on: db).wait()
+            try Relation(type: "t1", from: 1, to: 10, data: "").save(on: db).wait()
+            try Relation(type: "t", from: 1, to: 20, data: "").save(on: db).wait()
+        }.test(.GET, "/relations?from=1&type=t&to=2") { res in
+            XCTAssertEqual(res.status, .badRequest, "'to' XOR 'type'")
         }
     }
 
