@@ -15,9 +15,7 @@ struct RelationController {
     }
 
     func update(req: Request) throws -> EventLoopFuture<Relation> {
-        guard let relationId: Relation.IDValue = req.parameters.get(Path.Relations.id) else {
-            throw Abort(.badRequest, reason: "Cannot find 'relationId' in the path")
-        }
+        let relationId = try req.parameters.unwrapRelationId()
         let relationUpdate = try req.content.decode(Relation.Update.self)
 
         return Relation.find(relationId, on: req.db)
@@ -45,8 +43,17 @@ extension RelationController {
     }
 
     func get(req: Request) throws -> EventLoopFuture<Relation> {
-        let relationId: Int? = req.parameters.get(Path.Relations.id)
+        let relationId = try req.parameters.unwrapRelationId()
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
+    }
+}
+
+private extension Parameters {
+    func unwrapRelationId() throws -> Relation.IDValue {
+        guard let id: Relation.IDValue = get(Path.Relations.id) else {
+            throw Abort(.badRequest, reason: "Cannot find 'relationId' in the path")
+        }
+        return id
     }
 }

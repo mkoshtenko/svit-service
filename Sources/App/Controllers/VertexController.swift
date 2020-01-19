@@ -38,10 +38,10 @@ struct VertexController {
 
 private extension Parameters {
     func unwrapVertexId() throws -> Vertex.IDValue {
-        guard let vertexId: Vertex.IDValue = get(Path.Vertices.id) else {
+        guard let id: Vertex.IDValue = get(Path.Vertices.id) else {
             throw Abort(.badRequest, reason: "Cannot find 'vertexId' in the path")
         }
-        return vertexId
+        return id
     }
 }
 
