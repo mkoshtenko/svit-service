@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/vapor/fluent.git",
         "state": {
           "branch": null,
-          "revision": "5adacb3bd3e073fb2142b7713acce8992e3aadae",
-          "version": "4.0.0-beta.2"
+          "revision": "fa4382fd2eccd83e86a5a9c8aa18ff037dee13a2",
+          "version": "4.0.0-beta.2.2"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-kit.git",
         "state": {
           "branch": null,
-          "revision": "877bf492c591f96ddd2410cf763fb228b3c5bded",
-          "version": "1.0.0-beta.2.7"
+          "revision": "7dc374e6bf26f0bb2bbc55426d1b94668b542bef",
+          "version": "1.0.0-beta.2.9"
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-sqlite-driver.git",
         "state": {
           "branch": null,
-          "revision": "d2bb65b333a046e8ed64053312a6d6bdeb3a3590",
-          "version": "4.0.0-beta.2"
+          "revision": "184e19dea717c29f48afa4a35d7a232079c082ee",
+          "version": "4.0.0-beta.3"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor/postgres-kit.git",
         "state": {
           "branch": null,
-          "revision": "cb6e8a937bc9f3973ba0df4738cddab7a1ab068a",
-          "version": "2.0.0-beta.3.1"
+          "revision": "4d6b9bba4c4d45a5e637b6ad83f52f0aa955a64f",
+          "version": "2.0.0-beta.3.2"
         }
       },
       {
@@ -134,6 +134,15 @@
           "branch": null,
           "revision": "1bf9748cc62cd96d440a712a06cb301b66a27550",
           "version": "1.0.0-beta.2.1"
+        }
+      },
+      {
+        "package": "swift-backtrace",
+        "repositoryURL": "https://github.com/ianpartridge/swift-backtrace.git",
+        "state": {
+          "branch": null,
+          "revision": "eaf2cef011c0c23d1701aa60b364def8015dc3c7",
+          "version": "1.1.1"
         }
       },
       {
@@ -195,8 +204,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "adcce86be49463445a5b24c1bc3f0532b21ab845",
-          "version": "4.0.0-beta.3.1"
+          "revision": "b3e87b876d88d401583bba0b41db25b02e405e2a",
+          "version": "4.0.0-beta.3.3"
         }
       },
       {
