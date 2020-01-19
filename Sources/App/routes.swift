@@ -38,11 +38,11 @@ extension Application {
     }
 
     func connect(_ controller: RelationController) {
-        get(Path.relations, use: controller.list)
+        get(Path.relations, use: controller.getFromVertex(req:))
         post(Path.relations, use: controller.create)
-        get(Path.relations, .parameter(Path.Relations.id), use: controller.get)
         delete(Path.relations, .parameter(Path.Relations.id), use: controller.delete)
         patch(Path.relations, .parameter(Path.Relations.id), use: controller.update)
+        get(Path.relations, .parameter(Path.Relations.id), use: controller.get)
     }
 
     func connect(_ controller: RelationCountController) {

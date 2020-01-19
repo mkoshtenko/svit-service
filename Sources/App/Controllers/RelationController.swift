@@ -2,6 +2,16 @@ import Vapor
 import Fluent
 
 struct RelationController {
+    struct Query: Codable {
+        let from: Int
+        let type: String?
+    }
+
+    func getFromVertex(req: Request) throws -> EventLoopFuture<[Relation]> {
+        let query = try req.query.decode(Query.self)
+        return Relation.find(fromId: query.from, type: query.type, on: req.db)
+    }
+
     func create(req: Request) throws -> EventLoopFuture<Relation> {
         try Relation.validate(req)
         let relation = try req.content.decode(Relation.self)
@@ -46,6 +56,24 @@ extension RelationController {
         let relationId = try req.parameters.unwrapRelationId()
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
+    }
+}
+
+private extension Relation {
+    static func find(fromId: Int, type: String?, on db: Database) -> EventLoopFuture<[Relation]> {
+        return Vertex.find(fromId, on: db)
+            .unwrap(or: Abort(.notFound, reason: "Vertex with id \(fromId) not found"))
+            .flatMap { _ in
+                let query = Relation.query(on: db)
+                    .filter(\.$from == fromId)
+
+                if let type = type {
+                    query.filter(\.$type == type)
+                }
+
+                return query
+                    .all()
+        }
     }
 }
 

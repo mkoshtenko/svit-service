@@ -6,6 +6,29 @@ import XCTVapor
 
 final class RelationTests: XCTVaporTestCase {
 
+    func testGetRelationsFromVertexWithType() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try Relation(type: "t", from: 1, to: 10, data: "").save(on: db).wait()
+            try Relation(type: "t", from: 1, to: 20, data: "").save(on: db).wait()
+            try Relation(type: "t1", from: 1, to: 30, data: "").save(on: db).wait()
+        }.test(.GET, "/relations?from=10") { res in
+            XCTAssertEqual(res.status, .notFound)
+        }.test(.GET, "/relations?from=1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relations.count, 3)
+        }.test(.GET, "/relations?from=1&type=t") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relations.count, 2)
+        }.test(.GET, "/relations?from=1&type=t1") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relations.count, 1)
+        }.test(.GET, "/relations?from=1&type=unknown") { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqual(res.relations.count, 0)
+        }
+    }
+
     func testRelationLifecycle() throws {
         let relation = Relation(type: "t", from: 1, to: 2, data: "")
 
@@ -24,9 +47,6 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
         }.test(.GET, "/relations/\(1)") { res in
             XCTAssertEqual(res.status, .notFound)
-        }.test(.GET, "/relations") { res in
-            XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.body.string, "[]")
         }
     }
 
@@ -94,6 +114,11 @@ final class RelationTests: XCTVaporTestCase {
 }
 
 private extension XCTHTTPResponse {
+    var relations: [Relation] {
+        guard let data = body.data else { return [] }
+        return (try? JSONDecoder().decode([Relation].self, from: data)) ?? []
+    }
+
     var relation: Relation? {
         guard let data = body.data else { return nil }
         return try? JSONDecoder().decode(Relation.self, from: data)
