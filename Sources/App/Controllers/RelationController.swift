@@ -4,12 +4,13 @@ import Fluent
 struct RelationController {
     struct Query: Codable {
         let from: Int
+        let to: Int?
         let type: String?
     }
 
     func getFromVertex(req: Request) throws -> EventLoopFuture<[Relation]> {
         let query = try req.query.decode(Query.self)
-        return Relation.find(fromId: query.from, type: query.type, on: req.db)
+        return Relation.find(fromId: query.from, toId: query.to, type: query.type, on: req.db)
     }
 
     func create(req: Request) throws -> EventLoopFuture<Relation> {
@@ -48,10 +49,6 @@ struct RelationController {
 
 // TODO: remove these methods, they are for debugging only
 extension RelationController {
-    func list(req: Request) throws -> EventLoopFuture<[Relation]> {
-        return Relation.query(on: req.db).all()
-    }
-
     func get(req: Request) throws -> EventLoopFuture<Relation> {
         let relationId = try req.parameters.unwrapRelationId()
         return Relation.find(relationId, on: req.db)
@@ -60,7 +57,7 @@ extension RelationController {
 }
 
 private extension Relation {
-    static func find(fromId: Int, type: String?, on db: Database) -> EventLoopFuture<[Relation]> {
+    static func find(fromId: Int, toId: Int?, type: String?, on db: Database) -> EventLoopFuture<[Relation]> {
         return Vertex.find(fromId, on: db)
             .unwrap(or: Abort(.notFound, reason: "Vertex with id \(fromId) not found"))
             .flatMap { _ in
@@ -71,8 +68,11 @@ private extension Relation {
                     query.filter(\.$type == type)
                 }
 
-                return query
-                    .all()
+                if let to = toId {
+                    query.filter(\.$to == to)
+                }
+
+                return query.all()
         }
     }
 }
