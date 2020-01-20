@@ -7,16 +7,16 @@ If Vapor Toolbox is already installed skip to step 3.
 1. Install [homebrew](https://brew.sh), it will be used as package manager for Vapor toolbox. 
 
 2. Install Vapor Toolbox, it requires Swift 4.1 or higher
-```
-brew tap vapor/tap
-brew install vapor/tap/vapor
-```
+  ```
+ brew tap vapor/tap
+ brew install vapor/tap/vapor
+ ```
 
 3. Update Vapor Toolbox
-`brew upgrade vapor`
+  `brew upgrade vapor`
 
 4. Updates dependencies
-`vapor update`
+  `vapor update`
 
 If you are experiencing problems with Swift Package Manager, sometimes cleaning can help.
 `vapor clean`
@@ -57,6 +57,8 @@ Run containers in the background:
 docker-compose build
 docker-compose up -d
 ```
+After these commands the service should be accessible at configured location (e.g. `http://localhost:8080/health`).
+
 Using docker-compose ps, check the status of your services:
 ```
 docker-compose ps
@@ -64,6 +66,10 @@ docker-compose stop
 ```
 
 ## How to run a debug build
+
+For development purposes might be necessary to run the service from the Xcode and play with the API.
+Since this will require the database service running, the following steps explain how it can be launched.
+
 ### 1. Run PostgreSQL container
 Start a container with database instance:
 `docker run -d --name svit_db_postgres -e POSTGRES_USER=svit_db_user -e POSTGRES_DB=svit_db -e POSTGRES_PASSWORD=password -p 54320:5432 postgres:12`
