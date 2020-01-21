@@ -56,6 +56,18 @@ final class RelationTests: XCTVaporTestCase {
         }
     }
 
+    func testCreateRelation() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+        }.test(.POST, "/relations", json: Relation(type: "a", from: 1, to: 2, data: "{}")) { res in
+            XCTAssertEqual(res.status, .ok)
+            XCTAssertEqualJSON(res.body.string, Relation(id: 1, type: "a", from: 1, to: 2, data: "{}"))
+        }.test(.POST, "/relations", json: Vertex(type: "", data: "")) { res in
+            XCTAssertEqual(res.status, .internalServerError, "Does not accept empty type")
+        }
+    }
+
     func testRelationLifecycle() throws {
         let relation = Relation(type: "t", from: 1, to: 2, data: "")
 
