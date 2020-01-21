@@ -114,17 +114,17 @@ it takes configurations and migrations from `configure.swift` and will try to ex
 ## API usage examples
 ### VERTEX
 - create:
-`curl -H "Content-Type: application/json" -d '{"type":"test", "data":"{\"a\":1,\"b\":[]}"}' -X POST http://localhost:8080/vertices`
+`curl -H "Content-Type: application/json" -d '{"type":"test", "data":""}' -X POST http://localhost:8080/vertices`
 
 - delete:
 `curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/vertices/3`
 
 - update:
-`curl -H "Content-Type: application/json" -d '{"data":"{\"a\":\"UPDATED\"}"}' -X PATCH http://localhost:8080/vertices/1`
+`curl -H "Content-Type: application/json" -d '{"data":"UPDATED"}' -X PATCH http://localhost:8080/vertices/1`
 
 ### RELATION
 - create:
-`curl -H "Content-Type: application/json" -d '{"type":"implements", "from": 1, "to": 2, "data":"{\"aa\":11}"}' -X POST http://localhost:8080/relations`
+`curl -H "Content-Type: application/json" -d '{"type":"implements", "from": 1, "to": 2, "data":""}' -X POST http://localhost:8080/relations`
 
 - delete:
 `curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/relations/1`
@@ -132,6 +132,9 @@ it takes configurations and migrations from `configure.swift` and will try to ex
 - update:
 `curl -H "Content-Type: application/json" -d '{"data":"{\"aa\":100}"}' -X PATCH http://localhost:8080/relations/6`
 
+### COUNT
+- get:
+`curl http://127.0.0.1:8080/count?from=1&type=implements`
 
 ## Links
 Docker cheat-sheet:
