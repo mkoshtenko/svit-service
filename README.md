@@ -58,6 +58,7 @@ docker-compose build
 docker-compose up -d
 ```
 After these commands the service should be accessible at configured location (e.g. `http://localhost:8080/health`).
+The configuration can be changed in `web.Dockerfile`.
 
 Using docker-compose ps, check the status of your services:
 ```
@@ -98,8 +99,10 @@ docker exec -it svit_db_postgres psql -d svit_db -U svit_db_user
 ```
 
 ### 2. Migrations
-In vapor 4 db migration do not run automatically, to do so you have to execute:
+In vapor 4 db migration do not run automatically, to do so you need to execute:
 `swift run Run migrate`
+
+Or, as an alternative way, it is also possible to run them from the xcode with `migrate -y` argument added to the scheme.
 
 it takes configurations and migrations from `configure.swift` and will try to execute them. 
 
