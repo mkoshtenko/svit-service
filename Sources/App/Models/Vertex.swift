@@ -45,9 +45,6 @@ extension Vertex: Validatable {
      This method contains common validations for entity's create request.
      */
     static func validations(_ validations: inout Validations) {
-        // Does not accept an id from create request
-        validations.add("id", is: Validator<Optional<Int>>.nil)
-
         // The type is a string and should not be empty when creating new entity.
         validations.add("type", is: .alphanumeric && !.empty)
     }

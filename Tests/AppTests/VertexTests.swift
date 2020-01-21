@@ -6,7 +6,7 @@ import XCTVapor
 final class VertexTests: XCTVaporTestCase {
 
     func testCreateVertex() throws {
-        try app.test(.POST, "/vertices", json: Vertex(type: "a", data: "{}")) { res in
+        try app.test(.POST, "/vertices", json: ["type": "a", "data": "{}"]) { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqualJSON(res.body.string, Vertex(id: 1, type: "a", data: "{}"))
         }.test(.POST, "/vertices", json: Vertex(type: "", data: "")) { res in
