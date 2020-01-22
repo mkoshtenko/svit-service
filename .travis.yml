@@ -1,6 +1,7 @@
 os:
-  - linux
   - osx
+# requires a minimum Swift tools version of 5.1.0 (currently 4.1.0)
+# - linux
 language: swift
 sudo: required
 dist: trusty
