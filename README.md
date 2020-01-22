@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mkoshtenko/svit-service.svg?branch=master)](https://travis-ci.org/mkoshtenko/svit-service)
+
 ## Overview
 Storage for simple vertices inside table 
 
