@@ -10,6 +10,6 @@ script:
   - swift build
   - swift test
 after_success:
-  - bash scripts/deploy.sh
-  - bash <(curl -s https://codecov.io/bash)
+  - bash scripts/export-codecov.sh
+  - bash <(curl -s https://codecov.io/bash) -J "app" -D ".build/debug"
 
