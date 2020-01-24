@@ -8,7 +8,7 @@ dist: trusty
 osx_image: xcode11.3
 script:
   - swift build
-  - swift test
+  - swift test --enable-code-coverage
 after_success:
   - bash scripts/export-codecov.sh
   - bash <(curl -s https://codecov.io/bash) -J "app" -D ".build/debug"
