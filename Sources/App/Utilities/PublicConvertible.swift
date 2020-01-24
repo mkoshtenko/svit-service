@@ -6,14 +6,6 @@ protocol PublicConvertible {
     var publicContent: Public { get }
 }
 
-extension EventLoopFuture where Value: PublicConvertible {
-    func convertToPublic() -> EventLoopFuture<Value.Public> {
-        return map {
-            $0.publicContent
-        }
-    }
-}
-
 extension EventLoopFuture where Value: OptionalType, Value.WrappedType: PublicConvertible {
     func convertToPublic(default defaultValue: Value.WrappedType.Public) -> EventLoopFuture<Value.WrappedType.Public> {
         return map { optional in
