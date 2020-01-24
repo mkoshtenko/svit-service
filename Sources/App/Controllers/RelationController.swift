@@ -41,7 +41,7 @@ struct RelationController {
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        let relationId: Int? = req.parameters.get(Path.Relations.id)
+        let relationId = try req.parameters.unwrapRelationId()
         return Relation.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in relation.delete(on: req.db).map { relation } }

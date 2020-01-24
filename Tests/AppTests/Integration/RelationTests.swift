@@ -89,6 +89,20 @@ final class RelationTests: XCTVaporTestCase {
         }
     }
 
+    func testDeleteRelation() throws {
+        try app.prepare {
+            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
+            try Relation(id: 1, type: "t", from: 1, to: 2, data: "").save(on: db).wait()
+        }.test(.DELETE, "/relations/notId") { res in
+            XCTAssertEqual(res.status, .badRequest)
+        }.test(.DELETE, "/relations/\(1)") { res in
+            XCTAssertEqual(res.status, .ok)
+        }.prepare {
+            XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0, "Entity has been removed")
+        }
+    }
+
     func testRelationUpdateData() throws {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
 
@@ -96,6 +110,8 @@ final class RelationTests: XCTVaporTestCase {
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
             try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
             try Relation(id: 1, type: "t", from: 1, to: 2, data: "").save(on: db).wait()
+        }.test(.PATCH, "/relations/notId", json: ["data": json]) { res in
+            XCTAssertEqual(res.status, .badRequest)
         }.test(.PATCH, "/relations/\(1)", json: ["data": json, "type": "new"]) { res in
             XCTAssertEqual(res.status, .ok)
             let decoded = res.relation
