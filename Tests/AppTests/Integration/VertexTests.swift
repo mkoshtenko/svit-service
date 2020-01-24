@@ -52,6 +52,8 @@ final class VertexTests: XCTVaporTestCase {
         let vertex = Vertex(type: "type", data: "")
         try app.test(.POST, "/vertices", json: vertex) { res in
             XCTAssertEqual(res.status, .ok)
+        }.test(.PATCH, "/vertices/notId", json: ["data": json]) { res in
+            XCTAssertEqual(res.status, .badRequest)
         }.test(.PATCH, "/vertices/\(1)", json: ["data": json, "type": "new"]) { res in
             XCTAssertEqual(res.status, .ok)
             let decoded = res.vertex
@@ -71,6 +73,8 @@ final class VertexTests: XCTVaporTestCase {
             try Vertex(id: vertexId, type: "t", data: "").save(on: db).wait()
             try Relation(id: 1, type: "t1", from: 1, to: vertexId, data: "").save(on: db).wait()
             try Relation(id: 2, type: "t2", from: vertexId, to: 1, data: "").save(on: db).wait()
+        }.test(.DELETE, "/vertices/notId") { res in
+            XCTAssertEqual(res.status, .badRequest)
         }.test(.DELETE, "/vertices/\(vertexId)") { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.GET, "/vertices/\(vertexId)") { res in
