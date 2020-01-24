@@ -25,6 +25,7 @@ open class XCTVaporTestCase: XCTestCase {
 
     open override func tearDown() {
         super.tearDown()
+        try! app.migrator.revertAllBatches().wait()
         self.app.shutdown()
     }
 
