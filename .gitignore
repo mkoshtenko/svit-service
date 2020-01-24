@@ -6,4 +6,9 @@ DerivedData/
 .DS_Store
 db.sqlite
 .swiftpm
+
+# ignore vim temporary files
 *.swp
+
+# ignore code coverage files
+*.lcov
