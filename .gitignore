@@ -6,6 +6,7 @@ DerivedData/
 .DS_Store
 db.sqlite
 .swiftpm
+.env
 
 # ignore vim temporary files
 *.swp
