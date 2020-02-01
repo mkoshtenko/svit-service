@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/mkoshtenko/svit-service.svg?branch=master)](https://travis-ci.org/mkoshtenko/svit-service)
 [![codecov](https://codecov.io/gh/mkoshtenko/svit-service/branch/master/graph/badge.svg)](https://codecov.io/gh/mkoshtenko/svit-service)
+[![codebeat badge](https://codebeat.co/badges/ab58552c-96ab-4216-a399-d76621c9c8d7)](https://codebeat.co/projects/github-com-mkoshtenko-svit-service-master)
 
 ## Overview
 Storage for simple vertices inside table 
