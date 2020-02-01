@@ -1,15 +1,30 @@
-Packages
-.build
-xcuserdata
-*.xcodeproj
-DerivedData/
+## MacOS
 .DS_Store
-db.sqlite
-.swiftpm
-.env
 
-# ignore vim temporary files
+## vim
 *.swp
 
-# ignore code coverage files
+## User settings
+xcuserdata/
+
+## ignore test coverage data
 *.lcov
+
+## Obj-C/Swift specific
+*.hmap
+
+# Swift Package Manager
+#
+# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
+Packages/
+*.xcodeproj
+# Package.pins
+# Package.resolved
+
+# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
+# hence it is not needed unless you have added a package configuration file to your project
+.swiftpm
+
+.build/
+.env
+
