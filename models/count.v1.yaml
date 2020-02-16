@@ -1,0 +1,12 @@
+title: RelationCount
+type: object
+properties:
+  id:
+    type: integer
+  type:
+    type: string
+  from:
+    type: integer
+  value:
+    type: integer
+x-examples: {}

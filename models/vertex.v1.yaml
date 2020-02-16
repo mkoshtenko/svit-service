@@ -1,0 +1,20 @@
+title: Vertex
+type: object
+properties:
+  id:
+    type: integer
+  type:
+    type: string
+  data:
+    type: string
+x-examples:
+  create:
+    type: test
+    data: ''
+  update:
+    data: UPDATED
+  get:
+    id: 123
+    type: test
+    data: UPDATED
+description: ''

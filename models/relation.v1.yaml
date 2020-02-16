@@ -1,0 +1,13 @@
+title: Relation
+type: object
+properties:
+  id:
+    type: integer
+  type:
+    type: string
+  from:
+    type: integer
+  to:
+    type: integer
+  data:
+    type: string
