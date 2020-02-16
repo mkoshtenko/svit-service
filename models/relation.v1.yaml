@@ -11,3 +11,17 @@ properties:
     type: integer
   data:
     type: string
+x-examples:
+  create:
+    type: parent
+    from: 1
+    to: 2
+    data: ''
+  update:
+    data: '{"a":100}'
+  get:
+    id: 100
+    type: parent
+    from: 1
+    to: 2
+    data: ''

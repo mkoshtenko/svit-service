@@ -1,12 +1,14 @@
 title: RelationCount
 type: object
+x-examples:
+  get:
+    type: abc
+    from: 1
+    count: 2
 properties:
-  id:
-    type: integer
   type:
     type: string
   from:
     type: integer
-  value:
+  count:
     type: integer
-x-examples: {}
