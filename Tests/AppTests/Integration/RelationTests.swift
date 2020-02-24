@@ -64,7 +64,7 @@ final class RelationTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqualJSON(res.body.string, Relation(id: 1, type: "a", from: 1, to: 2, data: "{}"))
         }.test(.POST, "/relations", json: Vertex(type: "", data: "")) { res in
-            XCTAssertEqual(res.status, .internalServerError, "Does not accept empty type")
+            XCTAssertEqual(res.status, .badRequest, "Does not accept empty type")
         }
     }
 

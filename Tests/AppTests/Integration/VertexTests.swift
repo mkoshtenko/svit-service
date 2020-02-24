@@ -10,7 +10,7 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqualJSON(res.body.string, Vertex(id: 1, type: "a", data: "{}"))
         }.test(.POST, "/vertices", json: Vertex(type: "", data: "")) { res in
-            XCTAssertEqual(res.status, .internalServerError, "Does not accept empty type")
+            XCTAssertEqual(res.status, .badRequest, "Does not accept empty type")
         }
     }
 
