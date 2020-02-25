@@ -5,6 +5,13 @@
 ## Overview
 Storage for simple vertices inside table 
 
+# Swift `5.2` or greater is required
+It is in development status, however latest snapshot can be downloaded [here](https://swift.org/download/#releases)
+For docker container is used [nightly-5.2-bionic](https://hub.docker.com/r/swiftlang/swift/tags)
+
+Pull the container with the following:
+`docker pull swiftlang/swift:nightly-5.2-bionic`
+
 ## Dependencies
 If Vapor Toolbox is already installed skip to step 3.
 
@@ -27,10 +34,18 @@ If you are experiencing problems with Swift Package Manager, sometimes cleaning 
 
 ## Run tests
 
+### Locally on Mac OS using Xcode
+
 Open Xcode
 `vapor xcode -y`
 
 To run unit tests, select `Run` scheme and hit `Command+U`.
+
+### In a Docker container
+
+```
+docker build -f 'test.Dockerfile' .
+```
 
 ## How to build and run
 ### Docker
@@ -82,7 +97,7 @@ Start a container with database instance:
 The version of the container is `12`, it is taken from https://hub.docker.com/_/postgres
 This will add a user `svit_db_user`  and create the database  `svit_db`.
 The database will be accessible via  `54320` public port.
-These values are specified in `configure.swift`.
+These values are specified in `PSQLFactory.swift` as defaults.
 
 Print and check the container is listed there:
 `docker ps -a`
