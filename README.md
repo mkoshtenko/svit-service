@@ -5,13 +5,6 @@
 ## Overview
 Storage for simple vertices inside table 
 
-# Swift `5.2` or greater is required
-It is in development status, however latest snapshot can be downloaded [here](https://swift.org/download/#releases)
-The docker container is [nightly-5.2-bionic](https://hub.docker.com/r/swiftlang/swift/tags)
-
-Pull the container with the following:
-`docker pull swiftlang/swift:nightly-5.2-bionic`
-
 ## Dependencies
 If Vapor Toolbox is already installed skip to step 3.
 
@@ -34,7 +27,7 @@ If you are experiencing problems with Swift Package Manager, sometimes cleaning 
 
 ## Run tests
 
-### Locally on Mac OS using Xcode
+### Locally using Xcode on Mac OS
 
 Open Xcode
 `vapor xcode -y`
