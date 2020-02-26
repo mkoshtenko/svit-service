@@ -7,7 +7,7 @@ Storage for simple vertices inside table
 
 # Swift `5.2` or greater is required
 It is in development status, however latest snapshot can be downloaded [here](https://swift.org/download/#releases)
-For docker container is used [nightly-5.2-bionic](https://hub.docker.com/r/swiftlang/swift/tags)
+The docker container is [nightly-5.2-bionic](https://hub.docker.com/r/swiftlang/swift/tags)
 
 Pull the container with the following:
 `docker pull swiftlang/swift:nightly-5.2-bionic`
