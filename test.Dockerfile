@@ -1,5 +1,5 @@
-# Versions can be found here: https://hub.docker.com/r/swiftlang/swift/tags
-FROM swift:5.1.1
+# Versions can be found here: https://hub.docker.com/_/swift
+FROM swift:5.2
 
 ARG env
 
