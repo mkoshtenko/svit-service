@@ -10,14 +10,14 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqualJSON(res.body.string, Vertex(id: 1, type: "a", data: "{}"))
         }.test(.POST, "/vertices", json: Vertex(type: "", data: "")) { res in
-            XCTAssertEqual(res.status, .internalServerError, "Does not accept empty type")
+            XCTAssertEqual(res.status, .badRequest, "Does not accept empty type")
         }
     }
 
     func testAddAndDeleteVertex() throws {
         let vertex1 = Vertex(type: "type1", data: "")
         let vertex2 = Vertex(type: "type2", data: "")
-        
+
         try app.test(.GET, "/vertices") { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.body.string, "[]")
@@ -46,7 +46,7 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.body.string, "[]")
         }
     }
-    
+
     func testVertexUpdate() throws {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
         let vertex = Vertex(type: "type", data: "")
@@ -56,19 +56,19 @@ final class VertexTests: XCTVaporTestCase {
             XCTAssertEqual(res.status, .badRequest)
         }.test(.PATCH, "/vertices/\(1)", json: ["data": json, "type": "new"]) { res in
             XCTAssertEqual(res.status, .ok)
-            let decoded = res.vertex
-            XCTAssertNotNil(decoded)
-            XCTAssertEqual(decoded?.type, vertex.type, "Value shoud be equal to original")
-            XCTAssertEqual(decoded?.data, json, "Data field should be replaced with the new one")
+            XCTAssertContent(Vertex.self, res) { content in
+                XCTAssertEqual(content.type, vertex.type, "Value shoud be equal to original")
+                XCTAssertEqual(content.data, json, "Data field should be replaced with the new one")
+            }
         }.test(.PATCH, "/vertices/\(1)", json: ["a": "b"]) { res in
             XCTAssertEqual(res.status, .badRequest)
         }
     }
-    
+
     func testDeleteVertexWithRelations() throws {
         let vertexId = 2
-        
-        try app.prepare {
+
+        try app.prepare { db in
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
             try Vertex(id: vertexId, type: "t", data: "").save(on: db).wait()
             try Relation(id: 1, type: "t1", from: 1, to: vertexId, data: "").save(on: db).wait()
@@ -82,12 +82,5 @@ final class VertexTests: XCTVaporTestCase {
             // Verify relation was deleted
             XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
         }
-    }    
-}
-
-private extension XCTHTTPResponse {
-    var vertex: Vertex? {
-        guard let data = body.data else { return nil }
-        return try? JSONDecoder().decode(Vertex.self, from: data)
     }
 }

@@ -4,7 +4,7 @@ import Vapor
 final class Vertex: Model, Content {
     static let schema = "vertices"
     
-    @ID(key: "id")
+    @ID(custom: "id")
     var id: Int?
 
     @Field(key: "type")

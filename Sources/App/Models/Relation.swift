@@ -4,7 +4,7 @@ import Fluent
 final class Relation: Model, Content {
     static let schema = "relations"
 
-    @ID(key: "id")
+    @ID(custom: "id")
     var id: Int?
 
     @Field(key: "type")

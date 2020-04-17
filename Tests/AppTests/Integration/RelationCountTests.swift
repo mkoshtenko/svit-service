@@ -5,7 +5,7 @@ import XCTVapor
 
 final class RelationCountTests: XCTVaporTestCase {
     func testRelationsCountReturnsNotFound() throws {
-        try app.prepare {
+        try app.prepare { db in
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
         }.test(.GET, "/count?from=1&type=a") { res in
             XCTAssertEqual(res.status, .ok)
@@ -15,21 +15,18 @@ final class RelationCountTests: XCTVaporTestCase {
     }
 
     func testRelationsCountReturnsObject() throws {
-        try app.prepare {
+        try app.prepare { db in
             try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
             try RelationCount(id: 100, type: "t1", from: 1, value: 123).save(on: db).wait()
         }.test(.GET, "/count?from=1&type=t1") { res in
             XCTAssertEqual(res.status, .ok)
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t1", count: 123))
+            XCTAssertContent(RelationCount.Public.self, res) { content in
+                XCTAssertEqual(content, RelationCount.Public(from: 1, type: "t1", count: 123))
+            }
         }.test(.GET, "/count?from=1&type=t2") { res in
-            XCTAssertEqual(res.relationCount, RelationCount.Public(from: 1, type: "t2", count: 0))
+            XCTAssertContent(RelationCount.Public.self, res) { content in
+                XCTAssertEqual(content, RelationCount.Public(from: 1, type: "t2", count: 0))
+            }
         }
-    }
-}
-
-private extension XCTHTTPResponse {
-    var relationCount: RelationCount.Public? {
-        guard let data = body.data else { return nil }
-        return try? JSONDecoder().decode(RelationCount.Public.self, from: data)
     }
 }

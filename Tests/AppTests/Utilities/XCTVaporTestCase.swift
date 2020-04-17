@@ -30,14 +30,47 @@ open class XCTVaporTestCase: XCTestCase {
     }
 
     var db: Database {
-        return app.databases.database(.sqlite, logger: app.logger, on: app.eventLoopGroup.next())!
+        return app.sqliteDatabase!
+    }
+}
+
+extension Application {
+    var sqliteDatabase: Database? {
+        return databases.database(.sqlite, logger: logger, on: eventLoopGroup.next())
+    }
+}
+
+extension XCTApplicationTester where Self: Application {
+    @discardableResult
+    func prepare(closure: (Database) throws -> ()) throws -> XCTApplicationTester {
+        let database = try XCTUnwrap(sqliteDatabase)
+        try closure(database)
+        return self
     }
 }
 
 extension XCTApplicationTester {
     @discardableResult
-    func prepare(closure: () throws -> ()) throws -> XCTApplicationTester {
-        try closure()
-        return self
+    public func test<Body>(
+        _ method: HTTPMethod,
+        _ path: String,
+        headers: HTTPHeaders = [:],
+        json: Body,
+        file: StaticString = #file,
+        line: UInt = #line,
+        beforeRequest: (inout XCTHTTPRequest) throws -> () = { _ in },
+        afterResponse: (XCTHTTPResponse) throws -> () = { _ in }
+    ) throws -> XCTApplicationTester
+        where Body: Encodable
+    {
+        try test(method, path,
+                 headers: headers,
+                 file: file,
+                 line: line,
+                 beforeRequest: { req in
+                    try req.content.encode(json, as: .json)
+                    try beforeRequest(&req)
+        },
+                 afterResponse: afterResponse)
     }
 }
