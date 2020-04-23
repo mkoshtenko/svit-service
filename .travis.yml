@@ -5,11 +5,12 @@ services:
 sudo: required
 dist: trusty
 script:
+  - mkdir -p .build
   - docker build --no-cache -t svit-service-tests -f 'test.Dockerfile' .
   - containerId=$(docker create svit-service-tests)
-  - docker cp "${containerId}":.build/debug/codecov .build/debug/codecov
+  - docker cp "${containerId}":.build/debug/codecov .build/codecov
   - docker rm "${containerId}"
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -J "app" -D ".build/debug"
+  - bash <(curl -s https://codecov.io/bash) -J "app" -D ".build"
 
