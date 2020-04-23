@@ -32,12 +32,19 @@ If you are experiencing problems with Swift Package Manager, sometimes cleaning 
 Open Xcode
 `vapor xcode -y`
 
-To run unit tests, select `Run` scheme and hit `Command+U`.
+To run unit-tests, select `Run` scheme and hit `Command+U`.
 
 ### In a Docker container
 
+The following command builds docker container with tag `svit-service-tests` and executes unit-tests inside.
 ```
-docker build -f 'test.Dockerfile' .
+docker build -t svit-service-tests -f 'test.Dockerfile' .
+```
+Code-coverage report can be received by copying from the container with `docker cp`
+```
+containerId=$(docker create svit-service-tests)
+docker cp "${containerId}":app.coverage.lcov .
+docker rm "${containerId}"
 ```
 
 ## How to build and run
