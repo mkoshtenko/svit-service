@@ -1,15 +1,5 @@
 #!/bin/sh
 
-DESTINATION_DIR=$1
-
-if [[ -z "${DESTINATION_DIR}" ]]; then
-    echo "Invalid argument: Destination for exported data was not specified."
-    exit 22
-else
-    echo "Destination: ${DESTINATION_DIR}"
-    mkdir -p "${DESTINATION_DIR}"
-fi
-
 BIN_PATH="$(swift build --show-bin-path)"
 XCTEST_PATH="$(find ${BIN_PATH} -name '*.xctest')"
 
@@ -32,5 +22,3 @@ $LLVM_COV export "${COV_BIN}" \
   -instr-profile="${PROFILE_PATH}"/default.profdata \
   -format lcov >> app.coverage.lcov \
   -ignore-filename-regex="\.build/.*|Tests/.*"
-
-cp -r "${PROFILE_PATH}"/* ${DESTINATION_DIR}
