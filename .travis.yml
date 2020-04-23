@@ -1,15 +1,15 @@
 os:
-  - osx
-# requires a minimum Swift tools version of 5.1.0 (currently 4.1.0)
-# - linux
-language: swift
+  - linux
+services:
+  - docker
 sudo: required
 dist: trusty
-osx_image: xcode11.3
 script:
-  - swift build
-  - swift test --enable-code-coverage
+  - docker build --no-cache -t svit-service-tests -f 'test.Dockerfile' .
+  - containerId=$(docker create svit-service-tests)
+  - docker cp "${containerId}":.build/debug/codecov .build/debug/codecov
+  - docker rm "${containerId}"
+
 after_success:
-  - bash scripts/export-codecov.sh
   - bash <(curl -s https://codecov.io/bash) -J "app" -D ".build/debug"
 
