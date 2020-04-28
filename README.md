@@ -74,7 +74,8 @@ docker-compose config
 Run containers in the background:
 ```
 docker-compose build
-docker-compose up -d
+docker-compose up -d db
+docker-compose up -d app
 ```
 After these commands the service should be accessible at configured location (e.g. `http://localhost:8080/health`).
 The configuration can be changed in `web.Dockerfile`.
@@ -92,7 +93,14 @@ Since this will require the database service running, the following steps explai
 
 ### 1. Run PostgreSQL container
 Start a container with database instance:
-`docker run -d --name svit_db_postgres -e POSTGRES_USER=svit_db_user -e POSTGRES_DB=svit_db -e POSTGRES_PASSWORD=password -p 54320:5432 postgres:12`
+```
+docker run -d --name svit_db_postgres \
+  -e POSTGRES_USER=svit_db_user \
+  -e POSTGRES_DB=svit_db \
+  -e POSTGRES_PASSWORD=password \
+  -p 54320:5432 \
+  postgres:12
+```
 
 The version of the container is `12`, it is taken from https://hub.docker.com/_/postgres
 This will add a user `svit_db_user`  and create the database  `svit_db`.

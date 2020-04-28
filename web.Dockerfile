@@ -1,32 +1,48 @@
-# You can set the Swift version to what you need for your app. Versions can be found here: https://hub.docker.com/_/swift
-FROM swift:5.1
+# Versions can be found here: https://hub.docker.com/_/swift
+FROM swift:5.2 AS builder
 
 # For local build, add `--build-arg env=docker`
 # In your application, you can use `Environment.custom(name: "docker")` to check if you're in this env
 ARG env
 
-RUN apt-get -qq update && apt-get install -y \
-  libssl-dev zlib1g-dev \
-  && rm -r /var/lib/apt/lists/*
-WORKDIR /app
+RUN apt-get -q update && apt-get -q install -y \
+    libsqlite3-dev \
+    libssl-dev \
+    sqlite3 \
+    zlib1g-dev \
+    && rm -r /var/lib/apt/lists/*
+
+# RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so* /build/lib
+
+WORKDIR /build
+
+COPY ./Package.* ./
+RUN swift package resolve
+
 COPY . .
-RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so* /build/lib
-RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
+
+RUN swift build --enable-test-discovery -c release -Xswiftc -g
+
 
 # Production image
 FROM ubuntu:18.04
 ARG env
 # DEBIAN_FRONTEND=noninteractive for automatic UTC configuration in tzdata
 RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-  libatomic1 libicu60 libxml2 libcurl4 libz-dev libbsd0 tzdata \
-  && rm -r /var/lib/apt/lists/*
-WORKDIR /app
-COPY --from=builder /build/bin/Run .
-COPY --from=builder /build/lib/* /usr/lib/
-# Uncomment the next line if you need to load resources from the `Public` directory
-#COPY --from=builder /app/Public ./Public
-# Uncomment the next line if you are using Leaf
-#COPY --from=builder /app/Resources ./Resources
-ENV ENVIRONMENT=$env
+    libatomic1 \
+    libbsd0 \
+#    libcurl4 \
+    libicu60 \
+    libxml2 \
+    libz-dev \
+    tzdata \
+    && rm -r /var/lib/apt/lists/*
 
-ENTRYPOINT ./Run serve --env $ENVIRONMENT --hostname 0.0.0.0 --port 80 --auto-migrate
+WORKDIR /run
+
+COPY --from=builder /build/.build/release /run
+COPY --from=builder /usr/lib/swift/ /usr/lib/swift/
+
+ENTRYPOINT ["./Run"]
+# TODO: pass port number via environment
+CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port 80", "--auto-migrate"]
