@@ -31,7 +31,6 @@ ARG env
 RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libatomic1 \
     libbsd0 \
-#    libcurl4 \
     libicu60 \
     libxml2 \
     libz-dev \
