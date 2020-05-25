@@ -2,6 +2,7 @@ import Fluent
 import Vapor
 
 enum Path {
+    static let health: PathComponent = "health"
     static let vertices: PathComponent = "vertices"
     enum Vertices {
         static let id = "vertex_id"
@@ -19,10 +20,7 @@ enum Path {
 }
 
 func routes(_ app: Application) throws {
-    app.get("health") { req in
-        return "{ \"status\": \"UP\" }"
-    }
-
+    app.connect(HealthController())
     app.connect(VertexController())
     app.connect(RelationController())
     app.connect(RelationCountController())
@@ -47,5 +45,9 @@ extension Application {
 
     func connect(_ controller: RelationCountController) {
         get(Path.relationCount, use: controller.get)
+    }
+
+    func connect(_ controller: HealthController) {
+        get(Path.health, use: controller.getHealthInfo)
     }
 }
