@@ -6,7 +6,7 @@ extension HealthCheckTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__HealthCheckTests = [
-        ("testStatusUp", testStatusUp),
+        ("testHealthIsAvailable", testHealthIsAvailable),
     ]
 }
 
