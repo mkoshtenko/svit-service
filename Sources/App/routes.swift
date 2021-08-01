@@ -36,7 +36,7 @@ extension Application {
     }
 
     func connect(_ controller: RelationController) {
-        get(Path.relations, use: controller.getFromVertex(req:))
+        get(Path.relations, use: controller.getFromVertexModel(req:))
         post(Path.relations, use: controller.create)
         delete(Path.relations, .parameter(Path.Relations.id), use: controller.delete)
         patch(Path.relations, .parameter(Path.Relations.id), use: controller.update)

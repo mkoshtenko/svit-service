@@ -1,8 +1,8 @@
 import Fluent
 
-struct CreateVertex: Migration {
+struct CreateVertexModel: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema(Vertex.schema)
+        return database.schema(VertexModel.schema)
             .field("id", .int, .identifier(auto: true))
             .field("type", .string, .required)
             .field("data", .string, .required)
@@ -10,6 +10,6 @@ struct CreateVertex: Migration {
     }
 
     func revert(on database: Database) -> EventLoopFuture<Void> {
-        return database.schema(Vertex.schema).delete()
+        return database.schema(VertexModel.schema).delete()
     }
 }

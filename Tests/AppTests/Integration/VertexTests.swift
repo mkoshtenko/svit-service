@@ -5,18 +5,18 @@ import XCTVapor
 
 final class VertexTests: XCTVaporTestCase {
 
-    func testCreateVertex() throws {
+    func testCreateVertexModel() throws {
         try app.test(.POST, "/vertices", json: ["type": "a", "data": "{}"]) { res in
             XCTAssertEqual(res.status, .ok)
-            XCTAssertEqualJSON(res.body.string, Vertex(id: 1, type: "a", data: "{}"))
-        }.test(.POST, "/vertices", json: Vertex(type: "", data: "")) { res in
+            XCTAssertEqualJSON(res.body.string, VertexModel(id: 1, type: "a", data: "{}"))
+        }.test(.POST, "/vertices", json: VertexModel(type: "", data: "")) { res in
             XCTAssertEqual(res.status, .badRequest, "Does not accept empty type")
         }
     }
 
-    func testAddAndDeleteVertex() throws {
-        let vertex1 = Vertex(type: "type1", data: "")
-        let vertex2 = Vertex(type: "type2", data: "")
+    func testAddAndDeleteVertexModel() throws {
+        let vertex1 = VertexModel(type: "type1", data: "")
+        let vertex2 = VertexModel(type: "type2", data: "")
 
         try app.test(.GET, "/vertices") { res in
             XCTAssertEqual(res.status, .ok)
@@ -49,14 +49,14 @@ final class VertexTests: XCTVaporTestCase {
 
     func testVertexUpdate() throws {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
-        let vertex = Vertex(type: "type", data: "")
+        let vertex = VertexModel(type: "type", data: "")
         try app.test(.POST, "/vertices", json: vertex) { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.PATCH, "/vertices/notId", json: ["data": json]) { res in
             XCTAssertEqual(res.status, .badRequest)
         }.test(.PATCH, "/vertices/\(1)", json: ["data": json, "type": "new"]) { res in
             XCTAssertEqual(res.status, .ok)
-            XCTAssertContent(Vertex.self, res) { content in
+            XCTAssertContent(VertexModel.self, res) { content in
                 XCTAssertEqual(content.type, vertex.type, "Value shoud be equal to original")
                 XCTAssertEqual(content.data, json, "Data field should be replaced with the new one")
             }
@@ -69,8 +69,8 @@ final class VertexTests: XCTVaporTestCase {
         let vertexId = 2
 
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try Vertex(id: vertexId, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: vertexId, type: "t", data: "").save(on: db).wait()
             try Relation(id: 1, type: "t1", from: 1, to: vertexId, data: "").save(on: db).wait()
             try Relation(id: 2, type: "t2", from: vertexId, to: 1, data: "").save(on: db).wait()
         }.test(.DELETE, "/vertices/notId") { res in

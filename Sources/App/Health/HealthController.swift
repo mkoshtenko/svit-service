@@ -3,7 +3,7 @@ import Vapor
 struct HealthController {
     func getHealthInfo(req: Request) throws -> EventLoopFuture<[Resource]> {
         let startTime = Date()
-        let status: EventLoopFuture<Resource.Status> = Vertex.query(on: req.db).first().flatMapAlways { result in
+        let status: EventLoopFuture<Resource.Status> = VertexModel.query(on: req.db).first().flatMapAlways { result in
             switch result {
             case .success:
                 return req.eventLoop.makeSucceededFuture(.available)

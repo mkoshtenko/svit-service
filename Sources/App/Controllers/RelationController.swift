@@ -11,7 +11,7 @@ struct RelationController {
         let type: String?
     }
 
-    func getFromVertex(req: Request) throws -> EventLoopFuture<[Relation]> {
+    func getFromVertexModel(req: Request) throws -> EventLoopFuture<[Relation]> {
         let query = try req.query.decode(Query.self)
         return try Relation.find(fromId: query.from, toId: query.to, type: query.type, on: req.db)
     }
@@ -19,10 +19,10 @@ struct RelationController {
     func create(req: Request) throws -> EventLoopFuture<Relation> {
         try Relation.validate(req)
         let relation = try req.content.decode(Relation.self)
-        return Vertex.find(relation.from, on: req.db)
-            .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.from) not found"))
-            .flatMap { _ in Vertex.find(relation.to, on: req.db) }
-            .unwrap(or: Abort(.notFound, reason: "\(Vertex.self).id=\(relation.to) not found"))
+        return VertexModel.find(relation.from, on: req.db)
+            .unwrap(or: Abort(.notFound, reason: "\(VertexModel.self).id=\(relation.from) not found"))
+            .flatMap { _ in VertexModel.find(relation.to, on: req.db) }
+            .unwrap(or: Abort(.notFound, reason: "\(VertexModel.self).id=\(relation.to) not found"))
             .flatMap { _ in relation.save(on: req.db) }
             .flatMap { _ in RelationCount.incrementCount(vertexId: relation.from, type: relation.type, on: req.db) }
             .map { relation }
@@ -69,7 +69,7 @@ private extension Relation {
         guard (toId == nil && type != nil) || (toId != nil && type == nil) else {
             throw Abort(.badRequest, reason: "'to' and 'type' are mutually exclusive")
         }
-        return Vertex.find(fromId, on: db)
+        return VertexModel.find(fromId, on: db)
             .unwrap(or: Abort(.notFound, reason: "Vertex with id \(fromId) not found"))
             .flatMap { _ in
                 let query = Relation.query(on: db)

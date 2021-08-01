@@ -7,7 +7,7 @@ import Fluent
 final class RelationTests: XCTVaporTestCase {
     func testGetRelationsFromVertexWithType() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 10, data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 20, data: "").save(on: db).wait()
             try Relation(type: "t1", from: 1, to: 30, data: "").save(on: db).wait()
@@ -25,9 +25,9 @@ final class RelationTests: XCTVaporTestCase {
         }
     }
 
-    func testGetRelationsFromVertexToVertex() throws {
+    func testGetRelationsFromVertexToVertexModel() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 10, data: "").save(on: db).wait()
             try Relation(type: "t1", from: 1, to:10, data: "").save(on: db).wait()
             try Relation(type: "t2", from: 1, to: 20, data: "").save(on: db).wait()
@@ -47,7 +47,7 @@ final class RelationTests: XCTVaporTestCase {
 
     func testGetRelationsFromVertexWithTypeToVertexNotAllowed() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 2, data: "").save(on: db).wait()
             try Relation(type: "t1", from: 1, to: 10, data: "").save(on: db).wait()
             try Relation(type: "t", from: 1, to: 20, data: "").save(on: db).wait()
@@ -58,12 +58,12 @@ final class RelationTests: XCTVaporTestCase {
 
     func testCreateRelation() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
         }.test(.POST, "/relations", json: Relation(type: "a", from: 1, to: 2, data: "{}")) { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqualJSON(res.body.string, Relation(id: 1, type: "a", from: 1, to: 2, data: "{}"))
-        }.test(.POST, "/relations", json: Vertex(type: "", data: "")) { res in
+        }.test(.POST, "/relations", json: VertexModel(type: "", data: "")) { res in
             XCTAssertEqual(res.status, .badRequest, "Does not accept empty type")
         }
     }
@@ -72,8 +72,8 @@ final class RelationTests: XCTVaporTestCase {
         let relation = Relation(type: "t", from: 1, to: 2, data: "")
 
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 2, type: "t", data: "").save(on: db).wait()
         }.test(.POST, "/relations", json: Relation(type: "t", from: 100, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .notFound)
         }.test(.POST, "/relations", json: Relation(type: "t", from: 1, to: 200, data: "")) { res in
@@ -91,8 +91,8 @@ final class RelationTests: XCTVaporTestCase {
 
     func testDeleteRelation() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 2, type: "t", data: "").save(on: db).wait()
             try Relation(id: 1, type: "t", from: 1, to: 2, data: "").save(on: db).wait()
         }.test(.DELETE, "/relations/notId") { res in
             XCTAssertEqual(res.status, .badRequest)
@@ -106,8 +106,8 @@ final class RelationTests: XCTVaporTestCase {
         let json = String(data: try JSONEncoder().encode(["a": "b"]), encoding: .utf8)
 
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
-            try Vertex(id: 2, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 2, type: "t", data: "").save(on: db).wait()
             try Relation(id: 1, type: "t", from: 1, to: 2, data: "").save(on: db).wait()
         }.test(.PATCH, "/relations/notId", json: ["data": json]) { res in
             XCTAssertEqual(res.status, .badRequest)
@@ -124,9 +124,9 @@ final class RelationTests: XCTVaporTestCase {
 
     func testAddRelationIncrementsCount() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "", data: "").save(on: db).wait()
-            try Vertex(id: 2, type: "", data: "").save(on: db).wait()
-            try Vertex(id: 3, type: "", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "", data: "").save(on: db).wait()
+            try VertexModel(id: 2, type: "", data: "").save(on: db).wait()
+            try VertexModel(id: 3, type: "", data: "").save(on: db).wait()
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in
@@ -142,9 +142,9 @@ final class RelationTests: XCTVaporTestCase {
 
     func testDeleteRelationDecrementsCount() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "", data: "").save(on: db).wait()
-            try Vertex(id: 2, type: "", data: "").save(on: db).wait()
-            try Vertex(id: 3, type: "", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "", data: "").save(on: db).wait()
+            try VertexModel(id: 2, type: "", data: "").save(on: db).wait()
+            try VertexModel(id: 3, type: "", data: "").save(on: db).wait()
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 2, data: "")) { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.POST, "/relations", json: Relation(type: "t1", from: 1, to: 3, data: "")) { res in

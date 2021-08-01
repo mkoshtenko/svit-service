@@ -6,7 +6,7 @@ import XCTVapor
 final class RelationCountTests: XCTVaporTestCase {
     func testRelationsCountReturnsNotFound() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
         }.test(.GET, "/count?from=1&type=a") { res in
             XCTAssertEqual(res.status, .ok)
         }.test(.GET, "/count?from=10&type=a") { res in
@@ -16,7 +16,7 @@ final class RelationCountTests: XCTVaporTestCase {
 
     func testRelationsCountReturnsObject() throws {
         try app.prepare { db in
-            try Vertex(id: 1, type: "t", data: "").save(on: db).wait()
+            try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
             try RelationCount(id: 100, type: "t1", from: 1, value: 123).save(on: db).wait()
         }.test(.GET, "/count?from=1&type=t1") { res in
             XCTAssertEqual(res.status, .ok)

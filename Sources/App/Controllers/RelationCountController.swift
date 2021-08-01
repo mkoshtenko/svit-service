@@ -44,7 +44,7 @@ extension RelationCount {
     }
 
     static func find(vertexId: Int, type: String, on db: Database) -> EventLoopFuture<RelationCount?> {
-        return Vertex.find(vertexId, on: db)
+        return VertexModel.find(vertexId, on: db)
             .unwrap(or: Abort(.notFound, reason: "Vertex with id \(vertexId) not found"))
             .flatMap { _ in
                 return RelationCount.query(on: db)

@@ -1,7 +1,7 @@
 import Fluent
 import Vapor
 
-final class Vertex: Model, Content {
+final class VertexModel: Model, Content {
     static let schema = "vertices"
     
     @ID(custom: "id")
@@ -22,7 +22,7 @@ final class Vertex: Model, Content {
     }
 }
 
-extension Vertex {
+extension VertexModel {
     /**
      This structure is used for update requests
 
@@ -33,14 +33,14 @@ extension Vertex {
     }
 }
 
-extension Vertex: Equatable {
-    static func == (lhs: Vertex, rhs: Vertex) -> Bool {
+extension VertexModel: Equatable {
+    static func == (lhs: VertexModel, rhs: VertexModel) -> Bool {
         guard lhs !== rhs else { return true }
         return lhs.id == rhs.id && lhs.type == rhs.type && lhs.data == rhs.data
     }
 }
 
-extension Vertex: Validatable {
+extension VertexModel: Validatable {
     /**
      This method contains common validations for entity's create request.
      */
