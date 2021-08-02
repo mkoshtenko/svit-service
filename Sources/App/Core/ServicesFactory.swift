@@ -3,6 +3,7 @@ import Foundation
 final class ServicesFactory {
     struct RepositoryProvider {
         let vertices: VerticesRepository
+        let relations: RelationsRepository
     }
 
     private let repositories: RepositoryProvider
@@ -25,7 +26,7 @@ final class ServicesFactory {
     }
 
     private func reusedRelationsService() -> RelationsServiceImpl {
-        let service = relationsService ?? RelationsServiceImpl()
+        let service = relationsService ?? RelationsServiceImpl(repository: repositories.relations)
         relationsService = service
         return service
     }

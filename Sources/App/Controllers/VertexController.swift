@@ -13,7 +13,7 @@ struct VertexController {
         try VertexModel.validate(req)
         let model = try req.content.decode(VertexModel.self)
         return req.execute { vertices, handler in
-            vertices.makeVertex(type: model.type, data: model.data, completion: handler)
+            vertices.createVertex(type: model.type, data: model.data, completion: handler)
         }
     }
 
@@ -27,10 +27,9 @@ struct VertexController {
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let id = try req.parameters.vertexID()
-        return VertexModel.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .deleteWithAllRelations(on: req.db)
-            .map { .ok }
+        return req.execute { vertices, handler in
+            vertices.deleteVertex(withID: id, completion: handler)
+        }.map { _ in .ok }
     }
 }
 
@@ -51,13 +50,13 @@ private extension EventLoopFuture where Value == VertexModel {
         }
         .unwrap(or: Abort(.notFound))
         .flatMap { id in
-            Relation.query(on: database)
+            RelationModel.query(on: database)
                 .filter(\.$to == id)
                 .delete()
                 .map { id }
         }
         .flatMap { id in
-            Relation.query(on: database)
+            RelationModel.query(on: database)
                 .filter(\.$from == id)
                 .delete()
         }

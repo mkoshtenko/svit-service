@@ -10,7 +10,7 @@ func configure(app: Application, context: Context) throws {
     app.registerMigrations(context.databaseFactory) {
         return [
             CreateVertexModel(),
-            CreateRelation(),
+            CreateRelationModel(),
             CreateRelationCount()
         ]
     }

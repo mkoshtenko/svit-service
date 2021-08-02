@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-final class Relation: Model, Content {
+final class RelationModel: Model, Content {
     static let schema = "relations"
 
     @ID(custom: "id")
@@ -30,7 +30,7 @@ final class Relation: Model, Content {
     }
 }
 
-extension Relation {
+extension RelationModel {
     /**
      This structure is used for update requests
 
@@ -42,8 +42,8 @@ extension Relation {
     }
 }
 
-extension Relation: Equatable {
-    static func == (lhs: Relation, rhs: Relation) -> Bool {
+extension RelationModel: Equatable {
+    static func == (lhs: RelationModel, rhs: RelationModel) -> Bool {
         guard lhs !== rhs else { return true }
         return lhs.id == rhs.id
             && lhs.type == rhs.type
@@ -53,7 +53,7 @@ extension Relation: Equatable {
     }
 }
 
-extension Relation: Validatable {
+extension RelationModel: Validatable {
     /**
      This method contains common validations for create requests.
      */

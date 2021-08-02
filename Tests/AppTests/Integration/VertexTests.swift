@@ -71,8 +71,8 @@ final class VertexTests: XCTVaporTestCase {
         try app.prepare { db in
             try VertexModel(id: 1, type: "t", data: "").save(on: db).wait()
             try VertexModel(id: vertexId, type: "t", data: "").save(on: db).wait()
-            try Relation(id: 1, type: "t1", from: 1, to: vertexId, data: "").save(on: db).wait()
-            try Relation(id: 2, type: "t2", from: vertexId, to: 1, data: "").save(on: db).wait()
+            try RelationModel(id: 1, type: "t1", from: 1, to: vertexId, data: "").save(on: db).wait()
+            try RelationModel(id: 2, type: "t2", from: vertexId, to: 1, data: "").save(on: db).wait()
         }.test(.DELETE, "/vertices/notId") { res in
             XCTAssertEqual(res.status, .badRequest)
         }.test(.DELETE, "/vertices/\(vertexId)") { res in
@@ -80,7 +80,7 @@ final class VertexTests: XCTVaporTestCase {
         }.test(.GET, "/vertices/\(vertexId)") { res in
             XCTAssertEqual(res.status, .notFound)
             // Verify relation was deleted
-            XCTAssertEqual(try Relation.query(on: db).all().wait().count, 0)
+            XCTAssertEqual(try RelationModel.query(on: db).all().wait().count, 0)
         }
     }
 }

@@ -1,7 +1,7 @@
 import Fluent
 
 extension FluentRepository: VerticesRepository {
-    func makeVertex(type: String, data: String, completion: @escaping RepositoryCompletion<Vertex>) {
+    func createVertex(type: String, data: String, completion: @escaping RepositoryCompletion<Vertex>) {
         let model = VertexModel(type: type, data: data)
         model.save(on: db)
             .map { model }
@@ -37,18 +37,6 @@ extension FluentRepository: VerticesRepository {
             }.whenComplete { result in
                 completion(Result(catching: { try result.getVertex() }))
             }
-    }
-}
-
-private extension Result where Failure == RepositoryError {
-    init(catching body: () throws -> Success) {
-        do {
-            self = .success(try body())
-        } catch let error as RepositoryError {
-            self = .failure(error)
-        } catch {
-            self = .failure(.generic(error))
-        }
     }
 }
 

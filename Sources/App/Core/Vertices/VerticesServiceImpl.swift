@@ -9,8 +9,8 @@ final class VerticesServiceImpl: VerticesService {
         self.delegate = delegate
     }
 
-    func makeVertex(type: String, data: String, completion: @escaping (VertexResult) -> Void) {
-        repository.makeVertex(type: type, data: data) { result in
+    func createVertex(type: String, data: String, completion: @escaping (VertexResult) -> Void) {
+        repository.createVertex(type: type, data: data) { result in
             completion(result.mapError(\.verticesServiceError))
         }
     }
@@ -29,7 +29,10 @@ final class VerticesServiceImpl: VerticesService {
 
     func deleteVertex(withID id: VertexID, completion: @escaping (VertexResult) -> Void) {
         repository.deleteVertex(with: id) { result in
-            completion(result.mapError(\.verticesServiceError))
+            self.delegate.deleteRelations(for: id) { results in
+                // TODO: log errors
+                completion(result.mapError(\.verticesServiceError))
+            }
         }
     }
 }

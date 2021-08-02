@@ -1,6 +1,6 @@
 import Foundation
 
 protocol RelationsServiceDelegate {
-    func didCreateRelation(id: VertexID)
-    func didDeleteRelation(id: VertexID)
+    func didCreateRelationModel(id: VertexID)
+    func didDeleteRelationModel(id: VertexID)
 }

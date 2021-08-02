@@ -11,14 +11,14 @@ struct RelationController {
         let type: String?
     }
 
-    func getFromVertexModel(req: Request) throws -> EventLoopFuture<[Relation]> {
+    func getFromVertexModel(req: Request) throws -> EventLoopFuture<[RelationModel]> {
         let query = try req.query.decode(Query.self)
-        return try Relation.find(fromId: query.from, toId: query.to, type: query.type, on: req.db)
+        return try RelationModel.find(fromId: query.from, toId: query.to, type: query.type, on: req.db)
     }
 
-    func create(req: Request) throws -> EventLoopFuture<Relation> {
-        try Relation.validate(req)
-        let relation = try req.content.decode(Relation.self)
+    func create(req: Request) throws -> EventLoopFuture<RelationModel> {
+        try RelationModel.validate(req)
+        let relation = try req.content.decode(RelationModel.self)
         return VertexModel.find(relation.from, on: req.db)
             .unwrap(or: Abort(.notFound, reason: "\(VertexModel.self).id=\(relation.from) not found"))
             .flatMap { _ in VertexModel.find(relation.to, on: req.db) }
@@ -28,11 +28,11 @@ struct RelationController {
             .map { relation }
     }
 
-    func update(req: Request) throws -> EventLoopFuture<Relation> {
+    func update(req: Request) throws -> EventLoopFuture<RelationModel> {
         let relationId = try req.parameters.unwrapRelationId()
-        let relationUpdate = try req.content.decode(Relation.Update.self)
+        let relationUpdate = try req.content.decode(RelationModel.Update.self)
 
-        return Relation.find(relationId, on: req.db)
+        return RelationModel.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in
                 relation.data = relationUpdate.data
@@ -42,7 +42,7 @@ struct RelationController {
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let relationId = try req.parameters.unwrapRelationId()
-        return Relation.find(relationId, on: req.db)
+        return RelationModel.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { relation in relation.delete(on: req.db).map { relation } }
             .flatMap { relation in RelationCount.decrementCount(vertexId: relation.from, type: relation.type, on: req.db) }
@@ -52,15 +52,15 @@ struct RelationController {
 
 // TODO: remove these methods, they are for debugging only
 extension RelationController {
-    func get(req: Request) throws -> EventLoopFuture<Relation> {
+    func get(req: Request) throws -> EventLoopFuture<RelationModel> {
         let relationId = try req.parameters.unwrapRelationId()
-        return Relation.find(relationId, on: req.db)
+        return RelationModel.find(relationId, on: req.db)
             .unwrap(or: Abort(.notFound))
     }
 }
 
-private extension Relation {
-    static func find(fromId: Int, toId: Int?, type: String?, on db: Database) throws -> EventLoopFuture<[Relation]> {
+private extension RelationModel {
+    static func find(fromId: Int, toId: Int?, type: String?, on db: Database) throws -> EventLoopFuture<[RelationModel]> {
         guard toId != nil || type != nil else {
             throw Abort(.badRequest, reason: "'to' XOR 'type' must be added to the request")
         }
@@ -72,7 +72,7 @@ private extension Relation {
         return VertexModel.find(fromId, on: db)
             .unwrap(or: Abort(.notFound, reason: "Vertex with id \(fromId) not found"))
             .flatMap { _ in
-                let query = Relation.query(on: db)
+                let query = RelationModel.query(on: db)
                     .filter(\.$from == fromId)
 
                 if let type = type {
@@ -89,8 +89,8 @@ private extension Relation {
 }
 
 private extension Parameters {
-    func unwrapRelationId() throws -> Relation.IDValue {
-        guard let id: Relation.IDValue = get(Path.Relations.id) else {
+    func unwrapRelationId() throws -> RelationModel.IDValue {
+        guard let id: RelationModel.IDValue = get(Path.Relations.id) else {
             throw Abort(.badRequest, reason: "Cannot find 'relationId' in the path")
         }
         return id

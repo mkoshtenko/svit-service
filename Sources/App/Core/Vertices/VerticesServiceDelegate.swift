@@ -1,5 +1,5 @@
 import Foundation
 
 protocol VerticesServiceDelegate {
-    func didDeleteVertex(id: VertexID)
+    func deleteRelations(for: VertexID, handler: @escaping RepositoryCompletion<[RelationID]>)
 }
